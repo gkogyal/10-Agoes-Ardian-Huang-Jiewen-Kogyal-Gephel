@@ -81,31 +81,31 @@ Debugging/educational mode to show internals of AES, SHA-256, and ChaCha20 step-
 ├── src/
 │   │
 │   ├── aes/
-│   │   ├── AES.java            # AES-256 implementation
-│   │   ├── AESKeySchedule.java # 15 Rijndael key expansions
-│   │   └── Constants.java      # S-Box, Inverse S-Box, RCON values
+│   │   ├── AES256.java           # AES-256 implementation
+│   │   ├── AESKeySchedule.java   # 15 Rijndael key expansions
+│   │   └── Constants.java        # S-Box, Inverse S-Box, RCON values
 │   │
 │   ├── sha/
-│   │   ├── SHA256.java         # SHA-256 implementation
-│   │   └── Constants.java      # H and K constants; initial hash values and round constants
+│   │   ├── SHA256.java           # SHA-256 implementation
+│   │   └── Constants.java        # H and K constants; initial hash values and round constants
 │   │
 │   ├── vault/
-│   │   ├── Vault.java          # main program: CLI app managing interaction, storage, operations
-│   │   └── VaultEntry.java     # data model/container for a record
+│   │   ├── Vault.java            # main program: CLI app managing interaction, storage, operations
+│   │   └── VaultEntry.java       # data model/container for a record
 │   │
-│   └── chacha20/
-│       ├── ChaCha20.java		# ChaCha20 implementation
-│       ├── QuarterRound.java	# Helper function for ChaCha20 
-│       └── Constants.java		# Sigma constants and utility values
+│   └── chacha/
+│       ├── ChaCha20.java		  # ChaCha20 implementation
+│       ├── QuarterRound.java	  # Helper function for ChaCha20 
+│       └── Constants.java		  # Sigma constants and utility values
 │
 ├── testing/
-│   ├── TestSHA256.java         # SHA-256 test suite
-│   └── TestAES.java            # AES-256 test suite
-│   └── TestCha.java            # ChaCha20 test suite
+│   ├── TestSHA256.java           # SHA-256 test suite
+│   ├── TestAES256.java           # AES-256 test suite
+│   └── TestChaCha20.java         # ChaCha20 test suite
 │
 └── docker/
-    ├── Dockerfile              # Vulnerable container for attack demo
-    └── README.md               # Instructions for the CTF challenge
+    ├── Dockerfile                # Vulnerable container for attack demo
+    └── README_CTF.md             # Instructions for the CTF challenge
 
 ```
 
