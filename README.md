@@ -128,3 +128,6 @@ Debugging/educational mode to show internals of AES, SHA-256, and ChaCha20 step-
 ---
 
 ## References and Resources
+
+- [Every Algorithm - ChaCha20 Stream Cipher](https://every-algorithm.github.io/2025/06/19/chacha20.html)
+- [AMD - ChaCha20 Algorithms](https://docs.amd.com/r/en-US/Vitis_Libraries/security/guide_L1/internals/des.html_0)
