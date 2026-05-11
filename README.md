@@ -27,6 +27,40 @@ Built to demonstrate the inner workings of cryptographic primitives (well-establ
 
 ## Project Description
 
+The project has four parts:
+
+### 1. **Implementation**: Core cryptography algorithms (AES, SHA-256, ChaCha20)
+Fundamental **cryptographic primitives** built from scratch in Java.
+
+ - SHA-256 → hashing (one-way integrity to detect tampering and securely authenticate)
+ - AES-256 → block cipher encryption (block-based encryption for hiding confidential info)
+ - ChaCha20 → stream cipher encryption (continuous encryption, often faster/safer as alternative to AES)
+
+### 2. **Application**: Vault CLI
+Minimal, functional **credential vault** that stores site/username/password entries.
+
+ - password vault command-line interface
+ - master password authentication and credential storage+retrieval
+ - encryption/decryption integration:
+   - SHA for master password
+   - stored passwords encrypted with AES-256 or ChaCha20, using a key derived directly from the SHA-256 hash
+
+### 3. **Testing**: CTF security environment (Docker lab)
+Intentionally **vulnerable environment** as a container for an attack simulation.
+
+ - Docker-based isolated lab environment using Digital Ocean droplets
+ - deliberate misconfigurations or vulnerabilities for CTF-style exploitation exercises (specifics are WIP)
+ - goal is to demonstrate real-world security failure scenarios
+
+### 4. **Visualization**: Terminal-based tracing
+Debugging/educational mode to show internals of AES, SHA-256, and ChaCha20 step-by-step
+
+ - SHA-256 round-by-round state evolution
+ - AES state transformations (SubBytes, ShiftRows, MixColumns, etc)
+ - ChaCha20 state and quarter-round progression
+ - test suites for 
+ - optional verbose CLI trace mode for debugging/visualizing
+
 ---
 
 ## Features
@@ -67,6 +101,7 @@ Built to demonstrate the inner workings of cryptographic primitives (well-establ
 ├── testing/
 │   ├── TestSHA256.java         # SHA-256 test suite
 │   └── TestAES.java            # AES-256 test suite
+│   └── TestCha.java            # ChaCha20 test suite
 │
 └── docker/
     ├── Dockerfile              # Vulnerable container for attack demo
