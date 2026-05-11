@@ -3,7 +3,7 @@
 A command-line password manager that implements **SHA-256**, **AES-256**, and **ChaCha20** from scratch in Java without cryptographic libraries.
 
 Built to demonstrate the inner workings of cryptographic primitives (well-established, low-level cryptographic algorithms): 
-1. AES-256: contemporary hashing
+1. SHA-256: contemporary hashing
 2. AES-256: symmetric block encryption
 3. ChaCha20: modern stream cipher encryption.
 
@@ -53,12 +53,12 @@ Intentionally **vulnerable environment** as a container for an attack simulation
  - goal is to demonstrate real-world security failure scenarios
 
 ### 4. **Visualization**: Terminal-based tracing
-Debugging/educational mode to show internals of AES, SHA-256, and ChaCha20 step-by-step
+**Debugging/educational mode** to show internals of AES, SHA-256, and ChaCha20 step-by-step
 
  - SHA-256 round-by-round state evolution
  - AES state transformations (SubBytes, ShiftRows, MixColumns, etc)
  - ChaCha20 state and quarter-round progression
- - test suites for 
+ - test suites for showing accuracy in a large number of cases
  - optional verbose CLI trace mode for debugging/visualizing
 
 ---
