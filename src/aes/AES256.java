@@ -53,4 +53,39 @@ public class AES256{
       }
     }
   }
+
+  /*
+    The shiftRows() function is the second step in the AES encryption process. It takes the state and shifts the rows to the left. 
+    The first row is not shifted, the second row is shifted by 1 position, the third row is shifted by 2 positions, and the fourth row is shifted by 3 positions. 
+  */
+
+  public void shiftRows(int[][] state){
+    int[] temp = new int[4];
+    for(int i = 1; i < 4; i++){
+      for (int j = 0; j < 4; j++){
+        temp[j] = state[i][(j + i) % 4];
+      }
+      for (int j = 0; j < 4; j++){
+        state[i][j] = temp[j];
+      }
+    }
+  }
+
+  /*
+    The inverseShiftRows() function is used in the decryption process. 
+    It takes the state and shifts the rows to the right, reversing the transformation done by shiftRows().
+  */
+
+  public void inverseShiftRows(int[][] state){
+    int[] temp = new int[4];
+    for(int i = 1; i < 4; i++){
+      for (int j = 0; j < 4; j++){
+        temp[j] = state[i][(j - i) % 4];
+      }
+      for (int j = 0; j < 4; j++){
+        state[i][j] = temp[j];
+      }
+    }
+  }
 }
+
