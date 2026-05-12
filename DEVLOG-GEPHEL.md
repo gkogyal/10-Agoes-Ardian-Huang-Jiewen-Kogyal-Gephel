@@ -10,3 +10,4 @@
 * Adjusted repository structure
 * Added all constants for ChaCha20 with comment explanations; linked 2 extra resources in README
 * Built outline and comments for ChaCha20.java functions
+* Implemented Base/Key Conversion, Key-Nonce, and Utilities function sections for ChaCha20.java
