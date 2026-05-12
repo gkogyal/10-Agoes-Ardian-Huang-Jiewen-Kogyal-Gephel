@@ -80,10 +80,23 @@ public class AES256{
     int[] temp = new int[4];
     for(int i = 1; i < 4; i++){
       for (int j = 0; j < 4; j++){
-        temp[j] = state[i][(j - i) % 4];
+        temp[j] = state[i][(j - i + 4) % 4];
       }
       for (int j = 0; j < 4; j++){
         state[i][j] = temp[j];
+      }
+    }
+  }
+
+  /*
+    XORs the state with the round key. This is the last step in each round of AES encryption.
+    This is the step that actually incorporates the key into the encryption process, providing the security of the cipher.
+  */
+
+  public void addRoundKey(int[][] state, int[][] roundKey){
+    for(int i = 0; i < 4; i++){
+      for(int j = 0; j < 4; j++){
+        state[i][j] = state[i][j] ^ roundKey[i][j];
       }
     }
   }
