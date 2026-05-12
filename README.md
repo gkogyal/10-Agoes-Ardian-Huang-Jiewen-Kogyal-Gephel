@@ -3,7 +3,7 @@
 A command-line password manager that implements **SHA-256**, **AES-256**, and **ChaCha20** from scratch in Java without cryptographic libraries.
 
 Built to demonstrate the inner workings of cryptographic primitives (well-established, low-level cryptographic algorithms): 
-1. AES-256: contemporary hashing
+1. SHA-256: contemporary hashing
 2. AES-256: symmetric block encryption
 3. ChaCha20: modern stream cipher encryption.
 
@@ -53,12 +53,12 @@ Intentionally **vulnerable environment** as a container for an attack simulation
  - goal is to demonstrate real-world security failure scenarios
 
 ### 4. **Visualization**: Terminal-based tracing
-Debugging/educational mode to show internals of AES, SHA-256, and ChaCha20 step-by-step
+**Debugging/educational mode** to show internals of AES, SHA-256, and ChaCha20 step-by-step
 
  - SHA-256 round-by-round state evolution
  - AES state transformations (SubBytes, ShiftRows, MixColumns, etc)
  - ChaCha20 state and quarter-round progression
- - test suites for 
+ - test suites for showing accuracy in a large number of cases
  - optional verbose CLI trace mode for debugging/visualizing
 
 ---
@@ -132,3 +132,5 @@ Debugging/educational mode to show internals of AES, SHA-256, and ChaCha20 step-
 - [Every Algorithm - ChaCha20 Stream Cipher](https://every-algorithm.github.io/2025/06/19/chacha20.html)
 - [AMD - ChaCha20 Algorithms](https://docs.amd.com/r/en-US/Vitis_Libraries/security/guide_L1/internals/des.html_0)
 - [Implementinng Advanced Encryption Standard](https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.197.pdf)
+- [Wikipedia - SHA-2](https://en.wikipedia.org/wiki/SHA-2) pseudocode, helper function defs used in `src/sha/SHA256.java`
+- [NIST FIPS 180-4 - Secure Hash Standard](https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.180-4.pdf) Section 4.1.2 defines the helper functions and Section 4.2.2 lists the H and K constants used in `src/sha/Constants.java`
