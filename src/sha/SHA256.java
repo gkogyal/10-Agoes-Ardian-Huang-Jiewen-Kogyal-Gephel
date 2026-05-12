@@ -13,4 +13,19 @@ public class SHA256 {
         return (x & y) ^ (x & z) ^ (y & z);
     }
 
+    static int bigSigma0(int x) {
+        return rotr(x, 2) ^ rotr(x, 13) ^ rotr(x, 22);
+    }
+
+    static int bigSigma1(int x) {
+        return rotr(x, 6) ^ rotr(x, 11) ^ rotr(x, 25);
+    }
+
+    static int smallSigma0(int x) {
+        return rotr(x, 7) ^ rotr(x, 18) ^ (x >>> 3);
+    }
+
+    static int smallSigma1(int x) {
+        return rotr(x, 17) ^ rotr(x, 19) ^ (x >>> 10);
+    }
 }

@@ -9,3 +9,6 @@
 ## 2026-05-11
 
 * Updated `PROPOSAL.md` with updated  proposal and added markdown styling elements to proposal
+
+* Filled in `src/sha/SHA256.java` with the seven SHA-256 helper functions per FIPS 180-4: `rotr`, `ch`, `maj`, `bigSigma0`, `bigSigma1`, `smallSigma0`, `smallSigma1`. These are the bitwise primitives the compression loop will call once that's written
+* Compiled cleanly with `javac`
