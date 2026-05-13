@@ -12,3 +12,8 @@
 
 * Filled in `src/sha/SHA256.java` with the seven SHA-256 helper functions per FIPS 180-4: `rotr`, `ch`, `maj`, `bigSigma0`, `bigSigma1`, `smallSigma0`, `smallSigma1`. These are the bitwise primitives the compression loop will call once that's written
 * Compiled cleanly with `javac`
+* Added SHA-256 references (Wikipedia + NIST FIPS 180-4) to `README.md`.
+
+## 2026-05-12
+
+* Added `pad()` to `src/sha/SHA256.java`. this implements FIPS 180-4 $5.1.1 padding: appends a 0x80 byte then writes the original message bit length as a 64-bit big endian integer. Output length is always a multiple of 64 bytes so the compression loop can process it block by block

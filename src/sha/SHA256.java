@@ -28,4 +28,17 @@ public class SHA256 {
     static int smallSigma1(int x) {
         return rotr(x, 17) ^ rotr(x, 19) ^ (x >>> 10);
     }
+
+    static byte[] pad(byte[] message) {
+        int messageLen = message.length;
+        long bitLen = (long) messageLen * 8;
+        int totalLen = ((messageLen + 9 + 63) / 64) * 64;
+        byte[] padded = new byte[totalLen];
+        System.arraycopy(message, 0, padded, 0, messageLen);
+        padded[messageLen] = (byte) 0x80;
+        for (int i = 0; i < 8; i++) {
+            padded[totalLen - 1 - i] = (byte) (bitLen >>> (8 * i));
+        }
+        return padded;
+    }
 }
