@@ -100,5 +100,38 @@ public class AES256{
       }
     }
   }
+
+   /*
+    The xtime() function is a helper function used in the MixColumns step of AES. 
+    It multiplies a byte by 0x02 in the finite field GF(2^8) --> this allows our numbers to wrap around when they exceed 255. 
+    This is done by left-shifting the byte and then applying a bitwise AND with 0xFF to ensure the result stays within the range of a byte.
+    If the most significant bit of the byte is 1, it also XORs the result with 0x1B (x^8 + x^4 + x^3 + x + 1), which is the irreducible polynomial used in AES.
+  */
+
+  private int xtime(int byteValue){
+    return ((byteValue << 1) ^ (((byteValue >> 7) & 1) * 0x1B)) & 0xFF;
+  }
+
+  /*
+    The multiply9(), multiply11(), multiply13(), and multiply14() functions are helper functions used in the inverse MixColumns step of AES. 
+    They multiply a byte by 0x09, 0x0B, 0x0D, and 0x0E respectively in the finite field GF(2^8). 
+    These functions are implemented using the xtime() function to perform the necessary multiplications.
+  */
+
+  private int multiply9(int byteValue){
+    return xtime(xtime(xtime(byteValue))) ^ byteValue;
+  }
+
+  private int multiply11(int byteValue){
+    return xtime(xtime(xtime(byteValue))) ^ xtime(byteValue) ^ byteValue;
+  }
+
+  private int multiply13(int byteValue){
+    return xtime(xtime(xtime(byteValue))) ^ xtime(xtime(byteValue)) ^ byteValue;
+  }
+
+  private int multiply14(int byteValue){
+    return xtime(xtime(xtime(byteValue))) ^ xtime(xtime(byteValue)) ^ xtime(byteValue);
+  }
 }
 

@@ -1,5 +1,8 @@
 # Devlog - Ardian Agoes
 
+## 2026-05-13
+
+
 ## 2026-05-12
 * Wrote `shiftrows()` and `inverseShiftRows()`, which move the bytes to different columns for further mixing. The inverse is for decryption purposes.
 * Wrote `addRoundKey`, which applies XOR to the state with the round keys. This is the only part where the secret key is XOR'ed with the state and providing security. 
