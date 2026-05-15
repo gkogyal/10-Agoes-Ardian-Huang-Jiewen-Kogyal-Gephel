@@ -14,15 +14,16 @@ public class ChaCha20 {
 	  		   byte[] key			32-byte ChaCha20 key
 
 	  Process:
-	  		* Encrypts plaintext using ChaCha20.
-			* Generate random nonce
+	  		* Validate key
+	  		* Generate encrypted text with xcrypt using given key and generated nonce 
+			* Output encrypted text with nonce prepended
 
 	  Returns: byte[] output >> 12 byte nonce + ciphertext
 	  ====================*/
 	public static byte[] encrypt(byte[] plaintext, byte[] key) {
 		validateKey(key);
 		byte[] nonce = generateNonce();
-		byte[] ciphertext = xcrypt(plaintex, key, nonce, 1);
+		byte[] ciphertext = xcrypt(plaintext, key, nonce, 1);
 
 		// adding nonce to beginning
 		byte[] output = new byte[Constants.NONCE_BYTES + ciphertext.length];
@@ -38,9 +39,12 @@ public class ChaCha20 {
 	  		   byte[] key
 
 	  Process:
-	  		* X
+	  		* Validate key and ciphertext
+	  		* Extract nonce (first 12 bytes of ciphertext)
+	  		* Extract encrypted text (rest of ciphertext)
+	  		* Extract encrypted using xcrypt() with the given key and extracted nonce
 
-	  Returns: byte[] X >> ANS
+	  Returns: byte[] X >> encrypted text
 	  ====================*/	
 	public static byte[] decrypt(byte[] ciphertext, byte[] key) {
 		validateKey(key);
@@ -101,7 +105,8 @@ public class ChaCha20 {
 	  		   int counter
 
 	  Process:
-	  		* X
+	  		* Set up state by initializing 16 int array
+	  		* Add 4 sigma constants; Add 8 words of key; Add (1) block counter; Add 3 words of nonce
 
 	  Returns: X = ANS
 	  ====================*/
@@ -115,7 +120,6 @@ public class ChaCha20 {
 		state[3] = Constants.SIGMA[3];
 
 		// words 4-11: key (32 bytes -> 8 little-endian words)
-
 		for (int i = 0 ; i<8; i++) {
 			state[4 + i] = littleEndianWord(key, i * 4);
 		}
