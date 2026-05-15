@@ -29,3 +29,4 @@
 ## 2026-05-15
 
 * Back in after the sick days.
+* Added comments to code in `SHA256.java` in an effort to make code more perspicuous. 
