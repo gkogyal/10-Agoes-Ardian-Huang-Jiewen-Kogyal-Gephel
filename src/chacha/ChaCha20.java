@@ -84,18 +84,47 @@ public class ChaCha20 {
 	/***********************************************/
 	/*************** CORE COMPONENTS ***************/
 	/***********************************************/
-
+	
 	/*======== byte[] generateBlock() ==========
 
 	  Inputs:  int[] initialState
 
 	  Process:
-	  		* X
+	  		* Apply 10 rounds of 2 rounds (col + dia) to copy of initial
+			* Add working and initial state
 
-	  Returns: byte[] X = ANS
+	  Returns: byte[] X >> added states converted into bytes
 	  ====================*/
 	public static byte[] generateBlock(int[] initialState) {
+
+		// copy because need original for later step
+		int[] working = new int[Constants.STATE_WORDS];
+		System.arraycopy(initialState, 0, working, Constants.STATE_WORDS);
+
+		// 20 rounds -> 10 rounds of col/dia round
+		for (int i = 0; i<Constants.ROUNDS/2; i++) {
+
+			// Col
+			QuarterRound.apply(working, 0, 4, 8, 12);
+			QuarterRound.apply(working, 1, 5, 9, 13);
+			QuarterRound.apply(working, 2, 6, 10, 14);
+			QuarterRound.apply(working, 3, 7, 11, 15);
+
+			// Dia
+			QuarterRound.apply(working, 0, 4, 8, 12);
+			QuarterRound.apply(working, 1, 5, 9, 13);
+			QuarterRound.apply(working, 2, 6, 10, 14);
+			QuarterRound.apply(working, 3, 7, 11, 15);
+			
+		}
+
+		// Adding working state back to initial state (mod 2^32 so automatic integer overflow works)
+		for (int i = 0; i<Constants.STATE_WORDS; i++) {
+			working[i] += initialState[i];
+		}
+
 		
+		return wordsToBytes(working);
 	}
 
 	/*======== int[] buildInitialState() ==========
