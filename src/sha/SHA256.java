@@ -41,4 +41,16 @@ public class SHA256 {
         }
         return padded;
     }
+
+    static int[] messageSchedule(byte[] block, int offset) {
+        int[] W = new int[64];
+        for (int i = 0; i < 16; i++) {
+            int j = offset + i * 4;
+            W[i] = (block[j] & 0xff) << 24 | (block[j + 1] & 0xff) << 16 | (block[j + 2] & 0xff) << 8 | (block[j + 3] & 0xff);
+        }
+        for (int i = 16; i < 64; i++) {
+            W[i] = smallSigma1(W[i - 2]) + W[i - 7] + smallSigma0(W[i - 15]) + W[i - 16];
+        }
+        return W;
+    }
 }

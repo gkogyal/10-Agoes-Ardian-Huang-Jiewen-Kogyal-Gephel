@@ -17,3 +17,15 @@
 ## 2026-05-12
 
 * Added `pad()` to `src/sha/SHA256.java`. this implements FIPS 180-4 $5.1.1 padding: appends a 0x80 byte then writes the original message bit length as a 64-bit big endian integer. Output length is always a multiple of 64 bytes so the compression loop can process it block by block
+
+## 2026-05-13 + 2026-05-14 morning
+
+* Out sick; didn't get any commits in
+
+## 2026-05-14 nighttime
+
+* Added `messageSchedule(byte[] block, int offset)` to `src/sha/SHA256.java`. Reads the 16 32bit words out of a 64-byte block, then extends to 64 words using the recurrence `W[i] = smallSigma1(W[i-2]) + W[i-7] + smallSigma0(W[i-15]) + W[i-16]` (FIPS 180-4 6.2.2). This is the input the 64 compression rounds will iterate over
+
+## 2026-05-15
+
+* Back in after the sick days.
