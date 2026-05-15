@@ -2,6 +2,7 @@
 
 ## 2026-05-15
 * Finished buildInitialState() function of ChaCha20.java
+* Finished comment structure for decrypt()/buildInitialState()
 
 ## 2026-05-14
 * Finished encrypt/decrypt of ChaCha20.java
