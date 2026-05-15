@@ -106,7 +106,28 @@ public class ChaCha20 {
 	  Returns: X = ANS
 	  ====================*/
 	public static int[] buildInitialState(byte[] key, byte[] nonce, int counter) {
-		
+		int[] state = new int[Constants.STATE_WORDS];
+
+		// words 0-3: constants from "expand 32-bit k"
+		state[0] = Constants.SIGMA[0];
+		state[1] = Constants.SIGMA[1];
+		state[2] = Constants.SIGMA[2];
+		state[3] = Constants.SIGMA[3];
+
+		// words 4-11: key (32 bytes -> 8 little-endian words)
+
+		for (int i = 0 ; i<8; i++) {
+			state[4 + i] = littleEndianWord(key, i * 4);
+		}
+
+		// word 12: block counter
+
+		// words 13-15: nonce (12 bytes -> 3 little-endian words)
+		for( int i = 0 ; i<3; i++) {
+			state[13 + i] = littleEndianWord(nonce, i * 4);
+		}
+
+		return state;
 	}
 
 	/**************************************************/

@@ -1,5 +1,8 @@
 # Devlog - Gephel Kogyal
 
+## 2026-05-15
+* Finished buildInitialState() function of ChaCha20.java
+
 ## 2026-05-14
 * Finished encrypt/decrypt of ChaCha20.java
 
