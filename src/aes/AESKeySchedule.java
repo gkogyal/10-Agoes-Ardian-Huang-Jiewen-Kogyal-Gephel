@@ -10,11 +10,26 @@ public class AESKeySchedule{
     }
 
     for (int i = 8; i < 60; i++){
-      temp = sub
+      temp = words[i - 1];
+      if (i % 8 == 0){
+        temp = (subWord(rotWord(temp)) & (Constants.RCON[i / 8] << 24);
+      }
+      else if (i % 8 == 4){
+        temp = subWord(temp);
+      }
+      word[i] = word[i-8] ^ temp;
     }
+    return word;
   }
 
   private static int subWord(int word){
     return (Constants.SBOX[(word >>> 24) & 0xFF] << 24) | (Constants.SBOX[(word >>> 16) & 0xFF] << 16) | (Constants.SBOX[(word >>> 8) & 0xFF] << 8) | (Constants.SBOX[(word & 0xFF);
+  }
+
+  /*
+  Takes a four byte word and moves the first byte to the very end;
+  */
+  private static int rotWord(int word){
+    return (word << 8) | word >>> 24);
   }
 }
