@@ -1,5 +1,11 @@
 # Devlog - Gephel Kogyal
 
+## 2026-05-14
+* Finished encrypt/decrypt of ChaCha20.java
+
+## 2026-05-13
+* Finished QuarterRound.java: apply() function
+
 ## 2026-05-12
 * Added QuarterRound.java function structure and comment details
 * Added QuarterRound.java rot/applydirect functions

@@ -20,7 +20,30 @@ public class QuarterRound {
  
       Returns: void >> state[ai], state[bi], state[ci], state[di] updated in-place
       ====================*/
-    public static void apply(int[] state, int ai, int bi, int ci, int di) {} // WIP
+    public static void apply(int[] state, int ai, int bi, int ci, int di) {
+
+		int a = state[ai];
+		int b = state[bi];
+		int c = state[ci];
+		int d = state[di];
+
+		// round 1
+		a += b;  d ^= a;  d = rotl(d, Constants.ROT_16);
+
+		// round 2
+		c += d;  b ^= c;  b = rotl(b, Constants.ROT_12);
+
+		// round 3
+		a += b;  d ^= a;  d = rotl(d, Constants.ROT_8);
+
+		// round 4
+		c += d;  b ^= c;  b = rotl(b, Constants.ROT_7);
+
+		state[ai] = a;
+		state[bi] = b;
+		state[ci] = c;
+		state[di] = d;
+    }
 
     /*======== int rotl() ==========
       Inputs:  int x       32-bit word to rotate

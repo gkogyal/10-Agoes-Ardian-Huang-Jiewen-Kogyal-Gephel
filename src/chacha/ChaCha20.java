@@ -20,7 +20,16 @@ public class ChaCha20 {
 	  Returns: byte[] output >> 12 byte nonce + ciphertext
 	  ====================*/
 	public static byte[] encrypt(byte[] plaintext, byte[] key) {
-		
+		validateKey(key);
+		byte[] nonce = generateNonce();
+		byte[] ciphertext = xcrypt(plaintex, key, nonce, 1);
+
+		// adding nonce to beginning
+		byte[] output = new byte[Constants.NONCE_BYTES + ciphertext.length];
+		System.arraycopy(nonce, 0 , output, 0, Constants.NONCE_BYTES);
+		System.arraycopy(ciphertext, 0, output, Constants.NONCE_BYTES, ciphertext.length);
+
+		return output;
 	}
 
 	/*======== byte[] decrypt() ==========
@@ -34,7 +43,22 @@ public class ChaCha20 {
 	  Returns: byte[] X >> ANS
 	  ====================*/	
 	public static byte[] decrypt(byte[] ciphertext, byte[] key) {
-		
+		validateKey(key);
+
+		if (ciphertext == null || ciphertext.length < Constants.NONCE_BYTES) {
+			throw new IllegalArgumentException("Cipher text too short for nonce");
+		}
+
+		// getting nonce
+		byte[] nonce = new byte[Constants.NONCE_BYTES];
+		System.arraycopy(ciphertext, 0, nonce, 0, Constants.NONCE_BYTES);
+
+		// extracting the encrypted part
+		byte[] encrypted = new byte[ciphertext.length - Constants.NONCE_BYTES];
+		System.arraycopy(ciphertext, Constants.NONCE_BYTES, encrypted, 0, encrypted.length);
+
+		// symmetric so use same thing for output
+		return xcrypt(encrypted, key, nonce, 1);
 	}
 
 	/*======== byte[] xcrypt() ==========
