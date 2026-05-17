@@ -18,7 +18,7 @@ public class ChaCha20 {
 	  		* Generate encrypted text with xcrypt using given key and generated nonce 
 			* Output encrypted text with nonce prepended
 
-	  Returns: byte[] output >> 12 byte nonce + ciphertext
+	  Returns: byte[] output >> 12 byte nonce + encrypted text
 	  ====================*/
 	public static byte[] encrypt(byte[] plaintext, byte[] key) {
 		validateKey(key);
@@ -35,8 +35,8 @@ public class ChaCha20 {
 
 	/*======== byte[] decrypt() ==========
 
-	  Inputs:  byte[] ciphertext
-	  		   byte[] key
+	  Inputs:  byte[] ciphertext	12-bit nonce + encrypted text
+	  		   byte[] key 			
 
 	  Process:
 	  		* Validate key and ciphertext
@@ -67,18 +67,43 @@ public class ChaCha20 {
 
 	/*======== byte[] xcrypt() ==========
 
-	  Inputs:  byte[] input
-	  		   byte[] key
-	  		   byte[] nonce
-	  		   int counter
+	  Inputs:  byte[] input		encrypted/decrypted text
+	  		   byte[] key 		32-byte ChaCha20 key
+	  		   byte[] nonce		12-byte nonce
+	  		   int counter		initial block counter (1 for IETF, but keep option for )
 
 	  Process:
-	  		* X
-
-	  Returns: byte[] X >> ANS
+	  		* Validate key and nonce
+	  		* Generate 64-byte keystream block
+	  		* XOR each input byte with corresponding keystream byte
+			* IUncrement block counter for each additional 64-byte block needed
+			
+	  Returns: byte[] output >> ChaCha20'd input
 	  ====================*/	
 	public static byte[] xcrypt(byte[] input, byte[] key, byte[] nonce, int counter) {
+		validateKey(key);
+		validateNonce(nonce);
+
+		byte[] output = new byte[input.length];
+		int processed = 0;
 		
+
+		while (processed < input.length) {
+			// Build state for the current block counter and generate keystream
+			int[] state = buildInitialState(key, nonce, counter);
+			byte[] keystream = generateBlock(state);
+
+			// XOR as many bytes as available (up to 64)
+			int blockLen = Math.min(Constants.BLOCK_BYTES, input.length - processed);
+			for (int i = 0; i < blockLen; i++) {
+				output[processed + i] = (byte)(input[processed + i] ^ keystream[i]);
+			}
+
+			processed += blockLen;
+			counter++;
+		}
+
+		return output;
 	}
 
 	/***********************************************/
@@ -137,7 +162,7 @@ public class ChaCha20 {
 	  		* Set up state by initializing 16 int array
 	  		* Add 4 sigma constants; Add 8 words of key; Add (1) block counter; Add 3 words of nonce
 
-	  Returns: X = ANS
+	  Returns: int[] state = initial state of block
 	  ====================*/
 	public static int[] buildInitialState(byte[] key, byte[] nonce, int counter) {
 		int[] state = new int[Constants.STATE_WORDS];

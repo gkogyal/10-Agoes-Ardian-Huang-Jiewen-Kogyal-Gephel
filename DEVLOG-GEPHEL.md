@@ -1,5 +1,9 @@
 # Devlog - Gephel Kogyal
 
+## 2026-05-16
+* Added entire xcrypt() for ChaCha20.java
+* Fixed other function comments in ChaCha20.java
+
 ## 2026-05-15
 * Added buildInitialState() function of ChaCha20.java
 * Added comment structure for decrypt()/buildInitialState()
