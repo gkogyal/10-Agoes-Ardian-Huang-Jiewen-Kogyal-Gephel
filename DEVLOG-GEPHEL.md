@@ -1,5 +1,8 @@
 # Devlog - Gephel Kogyal
 
+## 2026-05-17
+* Added imports and main function for TestChaCha20
+
 ## 2026-05-16
 * Added entire xcrypt() for ChaCha20.java
 * Fixed other function comments in ChaCha20.java
