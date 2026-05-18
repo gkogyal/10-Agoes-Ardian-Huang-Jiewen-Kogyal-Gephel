@@ -11,18 +11,39 @@ public class AES256{
 
   public byte[] encrypt(byte[] plaintext, int eKey){
     int[][] state = bytesToState(plaintext);
-    addRoundKey(state, getRoundKey(expandedKey, 0));
-    for (int i = 0; i < 13; i++){
+    addRoundKey(state, getRoundKey(ekey, 0));
+    for (int i = 1; i < 14; i++){
       subBytes(state);
       shiftRows(state);
       mixColumns(state);
-      addRoundKey(state, getRoundKey(expandedKey, round));
+      addRoundKey(state, getRoundKey(ekey, i));
     }
     subBytes(state);
     shiftRows(state);
-    addRoundKey(state, getRoundKey(expandedKey, 14));
+    addRoundKey(state, getRoundKey(ekey, 14));
     return stateToBytes(state);
   }
+
+  /*
+   The decrypt() function is the main loop for AES-256 decryption.
+   It reverses the encryption process by running the inverse transformations in a backward sequence from Round 14 down to Round 0.
+   It begins by XOR'ing the ciphertext with the final round key, then loops through the rounds applying inverse transformations
+   */
+
+   public byte[] decrypt(byte[] ciphertext, int[] ekey){
+     int[][] state = bytesToState(ciphertext);
+     addRoundKey(state, getRoundKey(ekey, 14));
+     for (int i = 14; i > 1; i--){
+       inverseShiftRows(state);
+       inverseSubBytes(state);
+       addRoundKey(state, getRoundKey(ekey, i));
+       inverseMixColumns(state);
+     }
+     inverseShiftRows(state);
+     inverseSubBytes(state);
+     addRoundKey(state, getRoundKey(ekey, 0));
+     return stateToBytes(state);
+   }
 
   /*
   Treats the state as a 4x4 matrix of bytes and mixes the columns together. Each column is treated as a polynomial and multiplied by a fixed polynomial.
@@ -192,10 +213,10 @@ public class AES256{
     return xtime(xtime(xtime(byteValue))) ^ xtime(xtime(byteValue)) ^ xtime(byteValue);
   }
 
-  private int[][] getRoundKey(int[] expandedKey, int round){
+  private int[][] getRoundKey(int[] ekey, int round){
     int[][] roundKey = new int[4][4];
     for (int i = 0; i < 4; i++){
-      int word = expandedKey[round * 4 + i];
+      int word = ekey[round * 4 + i];
       roundKey[0][i] = (word >>> 24) & 0xFF;
       roundKey[1][i] = (word >>> 16) & 0xFF;
       roundKey[2][i] = (word >>> 8) & 0xFF;
