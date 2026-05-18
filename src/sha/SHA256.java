@@ -89,4 +89,9 @@ public class SHA256 {
         state[6] = state[6] + g;
         state[7] = state[7] + h;
     }
+    static byte[] hash(byte[] input) {
+        byte[] padded = pad(input);
+        int[] state = new int[8];
+        System.arraycopy(Constants.H, 0, state, 0, 8);
+    }
 }
