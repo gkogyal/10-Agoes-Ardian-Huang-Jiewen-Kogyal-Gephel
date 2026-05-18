@@ -8,6 +8,10 @@ import javax.crypto.Cipher;
 import javax.crypto.spec.ChaCha20ParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.security.SecureRandom;
+
+import org.apache.commons.lang3.RandomStringUtils;
+import java.util.Random;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -21,11 +25,10 @@ public class TestChaCha20 {
 
 	public static void main(String[] args) {
 
-		System.out.println("================================================");
-		System.out.println("|>>>>          ChaCha20 Test Suite         <<<<|");
-		System.out.println("================================================");
 
+		section("ChaCha20 Test Suite");
 
+		// wip: add ability to use multiple flags to pick which cases: (s,r,c) + (sr,sc,rc) + (src)
 		String[] staticCases = staticCases();
 		String[] randomCases = randomCases();
 		String[] customCases = customCases();
@@ -34,15 +37,13 @@ public class TestChaCha20 {
 		for (String str: staticCases) runTest(str);
 
 
-		section("STATIC TESTS (" + staticCases.length + " cases)");
+		section("RANDOM TESTS (" + randomCases.length + " cases)");
 		for (String str: randomCases) runTest(str);
 		
-		section("STATIC TESTS (" + staticCases.length + " cases)");
-		for (String str: staticCases) runTest(str);
+		section("CUSTOM TESTS (" + customCases.length + " cases)");
+		for (String str: customCases) runTest(str);
 
-		System.out.println("================================================");
-		System.out.printf( "             Passed: %d Failed %d", passed, failed);
-		System.out.println("================================================");
+		section("Passed: " + passed  + "   Failed " + failed);
     }
 
 
@@ -62,17 +63,52 @@ public class TestChaCha20 {
 
 	private static String[] randomCases() {
 
+		String[] randomStrings = new String[10];
 
+		for(int i = 0; i<10; i++ ) {
+			int length = random.nextInt(21) + 10;
+			String randomString = RandomStringUtils.random(length);
+			randomStrings[i] = randomString;
+		}
 		
+		return randomStrings;
+	}
+
+
+	private static String[] customCases() {
+		// should quit asking for more only if given just "QUIT"
+
+		ArrayList<String> customCases = 
+
+		while(true) {
+
+			// prompt with section()
+
+			// prompt with
+			
+		}
+
+		return customCases.toArray(new String[0]);
 	}
 
 
 
 	private static void runTest(String plaintext) {
-
-
+		
+		
 	}
 
-	
+	private static void section(String str, int N) {
+		N = Math.max(N,str.length()+10);
+
+		String div = "=".repeat(N);
+		String mid = " ".repeat((N - str.length())/2);
+
+		System.out.print(div + "\n" + str + "\n" + div);
+	}
+
+	private static void section(String str) {
+		section(str,Math.max(30,str.length()+10));
+	}
     
 }
