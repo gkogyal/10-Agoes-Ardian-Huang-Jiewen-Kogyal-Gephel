@@ -68,4 +68,17 @@ public class SHA256 {
     static void compress(int[] state, int[] W) {
         int a = state[0], b = state[1], c = state[2], d = state[3];
         int e = state[4], f = state[5], g = state[6], h = state[7];
+        for (int i = 0; i < 64; i++) {
+            int nextA = h + bigSigma1(e) + ch(e, f, g) + Constants.K[i] + W[i] + bigSigma0(a) + maj(a, b, c);
+            int nextE = d + h + bigSigma1(e) + ch(e, f, g) + Constants.K[i] + W[i];
+            a = nextA;
+            b = a;
+            c = b;
+            d = c;
+            e = nextE;
+            f = e;
+            g = f;
+            h = g;
+        }
+    }
 }
