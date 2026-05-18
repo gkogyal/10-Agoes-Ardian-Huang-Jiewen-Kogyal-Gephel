@@ -78,13 +78,15 @@ public class TestChaCha20 {
 	private static String[] customCases() {
 		// should quit asking for more only if given just "QUIT"
 
-		ArrayList<String> customCases = 
+		ArrayList<String> customCases = new ArrayList<String>;
+		Scanner scn =  new Scanner(System.in);
 
 		while(true) {
 
-			// prompt with section()
-
-			// prompt with
+			System.out.println("=".repeat(30));
+			System.out.print("Enter your input (QUIT to escape): ")
+			customCases.add(scn.nextLine());
+			System.out.println("=".repeat(30) + "\n");
 			
 		}
 
