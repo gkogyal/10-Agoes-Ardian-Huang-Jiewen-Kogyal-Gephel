@@ -3,6 +3,28 @@ package aes;
 public class AES256{
 
   /*
+  The encrypt() function is the main loop AES-256 encryption.
+  It takes a 16-byte plaintext block and the 60 word expanded key array and processes the data through 14 rounds.
+  It use an initial AddRoundKey step, runs 13 rounds of combined transformations (subBytes, shiftRows, mixColumns, addRoundKey)
+  It  finishes with a 14th round that omits the mixColumns step according to the NIST specification.
+  */
+
+  public byte[] encrypt(byte[] plaintext, int eKey){
+    int[][] state = bytesToState(plaintext);
+    addRoundKey(state, getRoundKey(expandedKey, 0));
+    for (int i = 0; i < 13; i++){
+      subBytes(state);
+      shiftRows(state);
+      mixColumns(state);
+      addRoundKey(state, getRoundKey(expandedKey, round));
+    }
+    subBytes(state);
+    shiftRows(state);
+    addRoundKey(state, getRoundKey(expandedKey, 14));
+    return stateToBytes(state);
+  }
+
+  /*
   Treats the state as a 4x4 matrix of bytes and mixes the columns together. Each column is treated as a polynomial and multiplied by a fixed polynomial.
   This is the third step in the AES encryption process and provides diffusion.
   */
@@ -38,9 +60,9 @@ public class AES256{
     }
   }
 
-  /* 
-    AES processes data in 16 byte or 128 bit blocks. A state is a 4x4 matrix of bytes, so we need to convert the input byte array into a state. 
-    The first 4 bytes of the input are the first column of the state, the next 4 bytes are the second column, and so on. 
+  /*
+    AES processes data in 16 byte or 128 bit blocks. A state is a 4x4 matrix of bytes, so we need to convert the input byte array into a state.
+    The first 4 bytes of the input are the first column of the state, the next 4 bytes are the second column, and so on.
     The bitwise AND with 0xFF converts the byte to an unsigned int, which is easier to work with in Java.
   */
 
@@ -52,8 +74,8 @@ public class AES256{
     return state;
   }
 
-  /* 
-    This funnction converts the 4x4 matrix state back into a 1D byte array. 
+  /*
+    This funnction converts the 4x4 matrix state back into a 1D byte array.
     The first column of the state becomes the first 4 bytes of the output, the second column becomes the next 4 bytes, etc.
   */
 
@@ -65,8 +87,8 @@ public class AES256{
     return output;
   }
 
-  /* 
-    The subBytes() function is the first step in the AES encryption process. It takes the state and applies the SBOX substitution to each byte. 
+  /*
+    The subBytes() function is the first step in the AES encryption process. It takes the state and applies the SBOX substitution to each byte.
     This is a nonlinear transformation that provides confusion, making it difficult for attackers to find patterns in the ciphertext.
   */
 
@@ -78,8 +100,8 @@ public class AES256{
     }
   }
 
-  /* 
-    The inverseSubBytes() function is used in the decryption process. 
+  /*
+    The inverseSubBytes() function is used in the decryption process.
     It takes the state and applies the inverse SBOX substitution to each byte, reversing the transformation done by subBytes().
   */
   public void inverseSubBytes(int[][] state){
@@ -91,8 +113,8 @@ public class AES256{
   }
 
   /*
-    The shiftRows() function is the second step in the AES encryption process. It takes the state and shifts the rows to the left. 
-    The first row is not shifted, the second row is shifted by 1 position, the third row is shifted by 2 positions, and the fourth row is shifted by 3 positions. 
+    The shiftRows() function is the second step in the AES encryption process. It takes the state and shifts the rows to the left.
+    The first row is not shifted, the second row is shifted by 1 position, the third row is shifted by 2 positions, and the fourth row is shifted by 3 positions.
   */
 
   public void shiftRows(int[][] state){
@@ -108,7 +130,7 @@ public class AES256{
   }
 
   /*
-    The inverseShiftRows() function is used in the decryption process. 
+    The inverseShiftRows() function is used in the decryption process.
     It takes the state and shifts the rows to the right, reversing the transformation done by shiftRows().
   */
 
@@ -138,8 +160,8 @@ public class AES256{
   }
 
    /*
-    The xtime() function is a helper function used in the MixColumns step of AES. 
-    It multiplies a byte by 0x02 in the finite field GF(2^8) --> this allows our numbers to wrap around when they exceed 255. 
+    The xtime() function is a helper function used in the MixColumns step of AES.
+    It multiplies a byte by 0x02 in the finite field GF(2^8) --> this allows our numbers to wrap around when they exceed 255.
     This is done by left-shifting the byte and then applying a bitwise AND with 0xFF to ensure the result stays within the range of a byte.
     If the most significant bit of the byte is 1, it also XORs the result with 0x1B (x^8 + x^4 + x^3 + x + 1), which is the irreducible polynomial used in AES.
   */
@@ -149,8 +171,8 @@ public class AES256{
   }
 
   /*
-    The multiply9(), multiply11(), multiply13(), and multiply14() functions are helper functions used in the inverse MixColumns step of AES. 
-    They multiply a byte by 0x09, 0x0B, 0x0D, and 0x0E respectively in the finite field GF(2^8). 
+    The multiply9(), multiply11(), multiply13(), and multiply14() functions are helper functions used in the inverse MixColumns step of AES.
+    They multiply a byte by 0x09, 0x0B, 0x0D, and 0x0E respectively in the finite field GF(2^8).
     These functions are implemented using the xtime() function to perform the necessary multiplications.
   */
 
@@ -169,5 +191,16 @@ public class AES256{
   private int multiply14(int byteValue){
     return xtime(xtime(xtime(byteValue))) ^ xtime(xtime(byteValue)) ^ xtime(byteValue);
   }
-}
 
+  private int[][] getRoundKey(int[] expandedKey, int round){
+    int[][] roundKey = new int[4][4];
+    for (int i = 0; i < 4; i++){
+      int word = expandedKey[round * 4 + i];
+      roundKey[0][i] = (word >>> 24) & 0xFF;
+      roundKey[1][i] = (word >>> 16) & 0xFF;
+      roundKey[2][i] = (word >>> 8) & 0xFF;
+      roundKey[3][i] = word & 0xFF;
+    }
+    return roundKey;
+  }
+}
