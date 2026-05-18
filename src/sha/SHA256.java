@@ -47,17 +47,16 @@ public class SHA256 {
     static int[] messageSchedule(byte[] block, int offset) { // takes a 64 byte block and builds the 64 word array for the compression loop
         int[] W = new int[64];
         for (int i = 0; i < 16; i++) { // first 16 words are just the raw block parsed from bytes into ints
-            int j = offset + i * 4;
-            W[i] = (block[j] & 0xff) << 24 | (block[j + 1] & 0xff) << 16 | (block[j + 2] & 0xff) << 8 | (block[j + 3] & 0xff);
+            W[i] = bytesToWord(block, offset + i * 4);
         }
         for (int i = 16; i < 64; i++) { // gen the other 48 words using previous words and the small sigmas
             W[i] = smallSigma1(W[i - 2]) + W[i - 7] + smallSigma0(W[i - 15]) + W[i - 16];
         }
         return W;
     }
-    
+
     static int bytesToWord(byte[] arr, int offset) {
-        return (arr[offset & 0xff] << 24) | (arr[offset+1] & 0xff) << 16 | (arr[offset+2] & 0xff) << 8 | (arr[offset + 3] & 0xff);
+        return (arr[offset] & 0xff) << 24 | (arr[offset+1] & 0xff) << 16 | (arr[offset+2] & 0xff) << 8 | (arr[offset + 3] & 0xff);
     }
     static void wordToBytes(int word, byte[] arr, int offset) {
         arr[offset] = (byte) (word >>> 24);

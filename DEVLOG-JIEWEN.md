@@ -29,4 +29,13 @@
 ## 2026-05-15
 
 * Back in after the sick days.
-* Added comments to code in `SHA256.java` in an effort to make code more perspicuous. 
+* Added comments to code in `SHA256.java` in an effort to make code more perspicuous.
+
+## 2026-05-15
+
+* Added `bytesToWord(byte[] arr, int offset)`; pulled the 4-byte big-endian unpacking out of `messageSchedule` so the loop reads cleanly.
+> Did also hit a parenthesis bug where `& 0xff` was inside the index (`arr[offset & 0xff]`) instead of masking the byte value (`(arr[offset] & 0xff)`); fixed
+
+### 5-17
+
+* Changed `messageSchedule` a little bit, the first loop is now a one-liner with the new bytesToWords fxn
