@@ -2,6 +2,42 @@ package aes;
 
 public class AES256{
 
+  /*
+  Treats the state as a 4x4 matrix of bytes and mixes the columns together. Each column is treated as a polynomial and multiplied by a fixed polynomial.
+  This is the third step in the AES encryption process and provides diffusion.
+  */
+
+  public void mixColumns(int[][] state){
+    for (int i = 0; i < 4; i++){
+      int s0 = state[0][i];
+      int s1 = state[1][i];
+      int s2 = state[2][i];
+      int s3 = state[3][i];
+      state[0][i] = xtime(s0) ^ xtime(s1) ^ s1 ^ s2 ^ s3;
+      state[1][i] = s0 ^ xtime(s1) ^ xtime(s2) ^ s2 ^ s3;
+      state[2][i] = s0 ^ s1 ^ xtime(s2) ^ xtime(s3) ^ s3;
+      state[3][i] = xtime(s0) ^ s0 ^ s1 ^ s2 ^ xtime(s3);
+    }
+  }
+
+  /*
+  The inverseMixColumns() function is used in the decryption process.
+  It takes the state and applies the inverse MixColumns transformation, reversing the diffusion provided by mixColumns() during encryption.
+  */
+
+  public void inverseMixColumns(int[][] state){
+    for (int i = 0; i < 4; i++){
+      int s0 = state[0][i];
+      int s1 = state[1][i];
+      int s2 = state[2][i];
+      int s3 = state[3][i];
+      state[0][i] = multiply14(s0) ^ multiply11(s1) ^ multiply13(s2) ^ multiply9(s3);
+      state[1][i] = multiply9(s0) ^ multiply14(s1) ^ multiply11(s2) ^ multiply13(s3);
+      state[2][i] = multiply13(s0) ^ multiply9(s1) ^ multiply14(s2) ^ multiply11(s3);
+      state[3][i] = multiply11(s0) ^ multiply13(s1) ^ multiply9(s2) ^ multiply14(s3);
+    }
+  }
+
   /* 
     AES processes data in 16 byte or 128 bit blocks. A state is a 4x4 matrix of bytes, so we need to convert the input byte array into a state. 
     The first 4 bytes of the input are the first column of the state, the next 4 bytes are the second column, and so on. 
