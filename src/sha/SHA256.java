@@ -55,4 +55,11 @@ public class SHA256 {
         }
         return W;
     }
+    
+    static int bytesToWord(byte[] arr, int offset) {
+        return (arr[offset & 0xff] << 24) | (arr[offset+1] & 0xff) << 16 | (arr[offset+2] & 0xff) << 8 | (arr[offset + 3] & 0xff);
+    }
+    static void wordToBytes(int word, byte[] arr, int offset) {
+        arr[offset] = (byte) (word >>> 24);
+    }
 }
