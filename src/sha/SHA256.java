@@ -71,14 +71,14 @@ public class SHA256 {
         for (int i = 0; i < 64; i++) {
             int nextA = h + bigSigma1(e) + ch(e, f, g) + Constants.K[i] + W[i] + bigSigma0(a) + maj(a, b, c);
             int nextE = d + h + bigSigma1(e) + ch(e, f, g) + Constants.K[i] + W[i];
-            a = nextA;
-            b = a;
-            c = b;
-            d = c;
-            e = nextE;
-            f = e;
-            g = f;
             h = g;
+            g = f;
+            f = e;
+            e = nextE;
+            d = c;
+            c = b;
+            b = a;
+            a = nextA;
         }
         state[0] = state[0] + a;
         state[1] = state[1] + b;
