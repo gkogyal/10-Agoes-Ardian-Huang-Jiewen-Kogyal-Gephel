@@ -36,10 +36,14 @@
 * Added `bytesToWord(byte[] arr, int offset)`; pulled the 4-byte big-endian unpacking out of `messageSchedule` so the loop reads cleanly.
 > Did also hit a parenthesis bug where `& 0xff` was inside the index (`arr[offset & 0xff]`) instead of masking the byte value (`(arr[offset] & 0xff)`); fixed
 
-### 5-17
+## 5-17
 
 * Changed `messageSchedule` a little bit, the first loop is now a one-liner with the new bytesToWords fxn
 * Added `wordToBytes(int word, byte[] arr, int offset)`, the inverse of the other fxn. Writes a 32-bit int into 4 consecutive bytes (big-endian). Not called yet but needed later when the 8-word final hash state has to be serialized into a `byte[32]` in `hash()` 
 * Added `compress(int[] state, int[] W)` to `src/sha/SHA256.java` which is the the SHA-256 compression function (FIPS 180-4 6.2.2). Takes the running 8-word state and the 64-word message schedule from one block, runs 64 rounds mixing in `K[i]` and `W[i]`, and adds the result back into the state in place
 * After the loop, the new working vars are *added* (not assigned) into the state. This is why the function is called "compress" and not "encrypt"
 > Also worth noting that I hit a bug in the variable shift where i originally wrote it top-down (`a = nextA; b = a; c = b`), but `b = a` overwrites a before c can read it, so a-d all collapsed to `nextA`. Fixed by reversing the order: `h = g; g = f; f = e; e = nextE; d = c; c = b; b = a; a = nextA;` so every read now happens before its overwrite.
+
+## 2026-05-18
+
+* Created `hash(byte[] input)` function, which is intended to create the final cryptographic hash by calling upon the other functions and rip the final 8 integers to 32 bytes.
