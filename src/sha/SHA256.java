@@ -60,5 +60,8 @@ public class SHA256 {
     }
     static void wordToBytes(int word, byte[] arr, int offset) {
         arr[offset] = (byte) (word >>> 24);
+        arr[offset+1] = (byte) (word >>> 16);
+        arr[offset+2] = (byte) (word >>> 8);
+        arr[offset+3] = (byte) word;
     }
 }

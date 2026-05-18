@@ -39,3 +39,4 @@
 ### 5-17
 
 * Changed `messageSchedule` a little bit, the first loop is now a one-liner with the new bytesToWords fxn
+* Added `wordToBytes(int word, byte[] arr, int offset)`, the inverse of the other fxn. Writes a 32-bit int into 4 consecutive bytes (big-endian). Not called yet but needed later when the 8-word final hash state has to be serialized into a `byte[32]` in `hash()` 
