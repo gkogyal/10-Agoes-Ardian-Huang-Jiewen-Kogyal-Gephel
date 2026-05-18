@@ -64,4 +64,8 @@ public class SHA256 {
         arr[offset+2] = (byte) (word >>> 8);
         arr[offset+3] = (byte) word;
     }
+
+    static void compress(int[] state, int[] W) {
+        int a = state[0], b = state[1], c = state[2], d = state[3];
+        int e = state[4], f = state[5], g = state[6], h = state[7];
 }
