@@ -1,12 +1,31 @@
 package testing;
 
+<<<<<<< HEAD
 import chacha.ChaCha20;
+=======
+<<<<<<< HEAD
+//import chacha20.ChaCha20;
+//import chacha20.Constants;
+//import chacha20.QuarterRound;
+=======
+import chacha.ChaCha20;
+>>>>>>> 7cdd7068b1d379e04e0aeefff26834c23fdbb48e
+>>>>>>> a7bb13c89c03b356d712736b51aa63ccd500d292
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.ChaCha20ParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.security.SecureRandom;
 
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+//import org.apache.commons.lang3.RandomStringUtils;
+import java.util.Random;
+
+=======
+>>>>>>> 7cdd7068b1d379e04e0aeefff26834c23fdbb48e
+>>>>>>> a7bb13c89c03b356d712736b51aa63ccd500d292
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Scanner;
@@ -32,7 +51,7 @@ public class TestChaCha20 {
 
 		section("RANDOM TESTS (" + randomCases.length + " cases)");
 		for (String str: randomCases) runTest(str);
-		
+
 		section("CUSTOM TESTS (" + customCases.length + " cases)");
 		for (String str: customCases) runTest(str);
 
@@ -55,15 +74,24 @@ public class TestChaCha20 {
 	}
 
 	private static String[] randomCases() {
-	
+
 		Scanner sc = new Scanner(System.in);
 		System.out.println("\nHow many random test cases? ");
 
 		int count = 10;
 		try {count = Integer.parseInt(sc.nextLine().trim());}
 		catch (Exception e) {System.out.println("Invalid number, defaulting to 10.");}
-		
 
+<<<<<<< HEAD
+
+=======
+<<<<<<< HEAD
+		for(int i = 0; i<10; i++ ) {
+			//int length = random.nextInt(21) + 10;
+			//String randomString = RandomStringUtils.random(length);
+			//randomStrings[i] = randomString;
+=======
+>>>>>>> a7bb13c89c03b356d712736b51aa63ccd500d292
 		String[] randomStrings = new String[count];
 
 		for(int i = 0; i<count; i++ ) {
@@ -74,9 +102,14 @@ public class TestChaCha20 {
 				bytes[j] = (byte)(32 + RNG.nextInt(95));
 			}
 
+<<<<<<< HEAD
+			randomStrings[i] = new String(bytes, java.nio.charset.StandardCharsets.US_ASCII);
+=======
 			randomStrings[i] = new String(bytes, java.nio.charset.StandardCharsets.US_ASCII);	
+>>>>>>> 7cdd7068b1d379e04e0aeefff26834c23fdbb48e
+>>>>>>> a7bb13c89c03b356d712736b51aa63ccd500d292
 		}
-		
+
 		return randomStrings;
 	}
 
@@ -91,7 +124,15 @@ public class TestChaCha20 {
 
 			System.out.println("=".repeat(30));
 			System.out.print("Enter your input (QUIT to escape): ");
+<<<<<<< HEAD
 			String line = scn.nextLine();
+=======
+<<<<<<< HEAD
+			customCases.add(scn.nextLine());
+=======
+			String line = scn.nextLine();
+>>>>>>> 7cdd7068b1d379e04e0aeefff26834c23fdbb48e
+>>>>>>> a7bb13c89c03b356d712736b51aa63ccd500d292
 			System.out.println("=".repeat(30) + "\n");
 
 			if (line.equals("QUIT")) break;
@@ -102,7 +143,7 @@ public class TestChaCha20 {
 	}
 
 
-	
+
 	private static void runTest(String plaintext) {
 		byte[] key = new byte[32];
 		byte[] nonce = new byte[12];
@@ -178,9 +219,9 @@ public class TestChaCha20 {
 		String clean = s.replaceAll("[\\r\\n\\t]", " ");
 		return clean.length() <= 30 ? "\"" + clean + "\"" : "\"" + clean.substring(0, 27) + "...\"";
 	}
-	
+
 	private static String truncate(String s, int max) {
 		return s.length() <= max ? s : s.substring(0, max) + "…";
 	}
-    
+
 }

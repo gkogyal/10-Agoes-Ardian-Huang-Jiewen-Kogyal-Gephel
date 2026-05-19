@@ -9,18 +9,18 @@ public class AES256{
   It  finishes with a 14th round that omits the mixColumns step according to the NIST specification.
   */
 
-  public byte[] encrypt(byte[] plaintext, int eKey){
+  public byte[] encrypt(byte[] plaintext, int[] eKey){
     int[][] state = bytesToState(plaintext);
-    addRoundKey(state, getRoundKey(ekey, 0));
-    for (int i = 1; i < 14; i++){
+    addRoundKey(state, getRoundKey(eKey, 0));
+    for (int i = 1; i <= 13; i++){
       subBytes(state);
       shiftRows(state);
       mixColumns(state);
-      addRoundKey(state, getRoundKey(ekey, i));
+      addRoundKey(state, getRoundKey(eKey, i));
     }
     subBytes(state);
     shiftRows(state);
-    addRoundKey(state, getRoundKey(ekey, 14));
+    addRoundKey(state, getRoundKey(eKey, 14));
     return stateToBytes(state);
   }
 
@@ -30,18 +30,18 @@ public class AES256{
    It begins by XOR'ing the ciphertext with the final round key, then loops through the rounds applying inverse transformations
    */
 
-   public byte[] decrypt(byte[] ciphertext, int[] ekey){
+   public byte[] decrypt(byte[] ciphertext, int[] eKey){
      int[][] state = bytesToState(ciphertext);
-     addRoundKey(state, getRoundKey(ekey, 14));
-     for (int i = 14; i > 1; i--){
+     addRoundKey(state, getRoundKey(eKey, 14));
+     for (int i = 13; i >= 1; i--){
        inverseShiftRows(state);
        inverseSubBytes(state);
-       addRoundKey(state, getRoundKey(ekey, i));
+       addRoundKey(state, getRoundKey(eKey, i));
        inverseMixColumns(state);
      }
      inverseShiftRows(state);
      inverseSubBytes(state);
-     addRoundKey(state, getRoundKey(ekey, 0));
+     addRoundKey(state, getRoundKey(eKey, 0));
      return stateToBytes(state);
    }
 
