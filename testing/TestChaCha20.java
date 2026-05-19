@@ -1,15 +1,15 @@
 package testing;
 
-import chacha20.ChaCha20;
-import chacha20.Constants;
-import chacha20.QuarterRound;
+//import chacha20.ChaCha20;
+//import chacha20.Constants;
+//import chacha20.QuarterRound;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.ChaCha20ParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.security.SecureRandom;
 
-import org.apache.commons.lang3.RandomStringUtils;
+//import org.apache.commons.lang3.RandomStringUtils;
 import java.util.Random;
 
 import java.util.ArrayList;
@@ -66,9 +66,9 @@ public class TestChaCha20 {
 		String[] randomStrings = new String[10];
 
 		for(int i = 0; i<10; i++ ) {
-			int length = random.nextInt(21) + 10;
-			String randomString = RandomStringUtils.random(length);
-			randomStrings[i] = randomString;
+			//int length = random.nextInt(21) + 10;
+			//String randomString = RandomStringUtils.random(length);
+			//randomStrings[i] = randomString;
 		}
 		
 		return randomStrings;
@@ -78,19 +78,19 @@ public class TestChaCha20 {
 	private static String[] customCases() {
 		// should quit asking for more only if given just "QUIT"
 
-		ArrayList<String> customCases = new ArrayList<String>;
+		ArrayList<String> customCases = new ArrayList<String>();
 		Scanner scn =  new Scanner(System.in);
 
 		while(true) {
 
 			System.out.println("=".repeat(30));
-			System.out.print("Enter your input (QUIT to escape): ")
+			System.out.print("Enter your input (QUIT to escape): ");
 			customCases.add(scn.nextLine());
 			System.out.println("=".repeat(30) + "\n");
 			
 		}
 
-		return customCases.toArray(new String[0]);
+		//return customCases.toArray(new String[0]);
 	}
 
 
