@@ -47,3 +47,4 @@
 ## 2026-05-18
 
 * Created `hash(byte[] input)` function, which is intended to create the final cryptographic hash by calling upon the other functions and rip the final 8 integers to 32 bytes.
+* Added verbose option to visualize the process for the SHA-256 algorithm.
