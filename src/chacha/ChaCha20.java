@@ -124,7 +124,15 @@ public class ChaCha20 {
 
 		// copy because need original for later step
 		int[] working = new int[Constants.STATE_WORDS];
+<<<<<<< HEAD
 		System.arraycopy(initialState, 0, working, 0, Constants.STATE_WORDS);
+=======
+<<<<<<< HEAD
+		//System.arraycopy(initialState, 0, working, Constants.STATE_WORDS);
+=======
+		System.arraycopy(initialState, 0, working, 0, Constants.STATE_WORDS);
+>>>>>>> 7cdd7068b1d379e04e0aeefff26834c23fdbb48e
+>>>>>>> a7bb13c89c03b356d712736b51aa63ccd500d292
 
 		// 20 rounds -> 10 rounds of col/dia round
 		for (int i = 0; i<Constants.ROUNDS/2; i++) {
