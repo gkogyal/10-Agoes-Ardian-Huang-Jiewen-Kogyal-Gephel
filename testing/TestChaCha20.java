@@ -1,20 +1,14 @@
 package testing;
 
-//import chacha20.ChaCha20;
-//import chacha20.Constants;
-//import chacha20.QuarterRound;
+import chacha.ChaCha20;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.ChaCha20ParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.security.SecureRandom;
 
-//import org.apache.commons.lang3.RandomStringUtils;
-import java.util.Random;
-
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Scanner;
 
 public class TestChaCha20 {
@@ -28,7 +22,6 @@ public class TestChaCha20 {
 
 		section("ChaCha20 Test Suite");
 
-		// wip: add ability to use multiple flags to pick which cases: (s,r,c) + (sr,sc,rc) + (src)
 		String[] staticCases = staticCases();
 		String[] randomCases = randomCases();
 		String[] customCases = customCases();
@@ -39,7 +32,7 @@ public class TestChaCha20 {
 
 		section("RANDOM TESTS (" + randomCases.length + " cases)");
 		for (String str: randomCases) runTest(str);
-		
+
 		section("CUSTOM TESTS (" + customCases.length + " cases)");
 		for (String str: customCases) runTest(str);
 
@@ -63,14 +56,27 @@ public class TestChaCha20 {
 
 	private static String[] randomCases() {
 
-		String[] randomStrings = new String[10];
+		Scanner sc = new Scanner(System.in);
+		System.out.println("\nHow many random test cases? ");
 
-		for(int i = 0; i<10; i++ ) {
-			//int length = random.nextInt(21) + 10;
-			//String randomString = RandomStringUtils.random(length);
-			//randomStrings[i] = randomString;
+		int count = 10;
+		try {count = Integer.parseInt(sc.nextLine().trim());}
+		catch (Exception e) {System.out.println("Invalid number, defaulting to 10.");}
+
+
+		String[] randomStrings = new String[count];
+
+		for(int i = 0; i<count; i++ ) {
+			int length = RNG.nextInt(291) + 10; // 10-300 chars
+
+			byte[] bytes = new byte[length];
+			for (int j = 0; j < length; j++) {
+				bytes[j] = (byte)(32 + RNG.nextInt(95));
+			}
+
+			randomStrings[i] = new String(bytes, java.nio.charset.StandardCharsets.US_ASCII);
 		}
-		
+
 		return randomStrings;
 	}
 
@@ -85,19 +91,72 @@ public class TestChaCha20 {
 
 			System.out.println("=".repeat(30));
 			System.out.print("Enter your input (QUIT to escape): ");
-			customCases.add(scn.nextLine());
+			String line = scn.nextLine();
 			System.out.println("=".repeat(30) + "\n");
-			
+
+			if (line.equals("QUIT")) break;
+			customCases.add(line);
 		}
 
-		//return customCases.toArray(new String[0]);
+		return customCases.toArray(new String[0]);
 	}
 
 
 
 	private static void runTest(String plaintext) {
-		
-		
+		byte[] key = new byte[32];
+		byte[] nonce = new byte[12];
+		RNG.nextBytes(key);
+		RNG.nextBytes(nonce);
+
+		byte[] plaintextBytes = plaintext.getBytes(java.nio.charset.StandardCharsets.UTF_8);
+
+		String label = preview(plaintext);
+
+		// javax.crypto used for chacha20
+		byte[] jaCha = javaEncrypt(plaintextBytes, key, nonce);
+		if (jaCha == null) {
+			System.out.printf("[SKIP] %s — javax.crypto unavailable%n", label);
+			return;
+		}
+
+		// my chacha20
+		byte[] myCha = ChaCha20.xcrypt(plaintextBytes, key, nonce, 1);
+
+		// printing results
+		printResult(label + " [ciphertext vs javax.crypto]", Arrays.equals(jaCha,myCha), ChaCha20.toHex(jaCha), ChaCha20.toHex(myCha));
+
+		// decrypting
+		byte[] recovered = ChaCha20.xcrypt(myCha, key, nonce, 1);
+
+		printResult(label + " [decrypting]", Arrays.equals(plaintextBytes, recovered), plaintext, new String(recovered, java.nio.charset.StandardCharsets.UTF_8));
+	}
+
+	private static byte[] javaEncrypt(byte[] plaintext, byte[] key, byte[] nonce) {
+		try {
+			SecretKeySpec keySpec = new SecretKeySpec(key, "ChaCha20");
+			ChaCha20ParameterSpec params = new ChaCha20ParameterSpec(nonce, 1);
+			Cipher cipher = Cipher.getInstance("ChaCha20");
+			cipher.init(Cipher.ENCRYPT_MODE, keySpec, params);
+			return cipher.doFinal(plaintext);
+		}
+		catch (Exception e) {
+			System.out.println("[ERRORR] javax.crypto: " + e.getMessage());
+			return null;
+		}
+	}
+
+	private static void printResult(String label, boolean ok, String exp, String got) {
+		if (ok) {
+			System.out.printf("[PASS] %s%n", label);
+			passed++;
+		}
+		else {
+			System.out.printf("[FAIL] %s%n", label);
+			System.out.printf("	  exp: %s%n", truncate(exp, 80));
+			System.out.printf("	  got: %s%n", truncate(got, 80));
+			failed++;
+		}
 	}
 
 	private static void section(String str, int N) {
@@ -112,5 +171,16 @@ public class TestChaCha20 {
 	private static void section(String str) {
 		section(str,Math.max(30,str.length()+10));
 	}
-    
+
+	private static String preview(String s) {
+		if (s.isEmpty()) return "<empty>";
+
+		String clean = s.replaceAll("[\\r\\n\\t]", " ");
+		return clean.length() <= 30 ? "\"" + clean + "\"" : "\"" + clean.substring(0, 27) + "...\"";
+	}
+
+	private static String truncate(String s, int max) {
+		return s.length() <= max ? s : s.substring(0, max) + "…";
+	}
+
 }
