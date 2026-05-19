@@ -38,4 +38,8 @@ public class TestAES256 {
             System.out.println("Status: broken");
         }
     }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 92cd0e6c86445aa1d3baf9ea7e35bbda2f693766
