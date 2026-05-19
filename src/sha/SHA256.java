@@ -89,4 +89,18 @@ public class SHA256 {
         state[6] = state[6] + g;
         state[7] = state[7] + h;
     }
+    static byte[] hash(byte[] input) {
+        byte[] padded = pad(input);
+        int[] state = new int[8];
+        System.arraycopy(Constants.H, 0, state, 0, 8);
+        for (int i = 0; i < padded.length; i += 64) {
+            int[] W = messageSchedule(padded, i);
+            compress(state, W); //makes state stay in place
+        }
+        byte[] output = new byte[32];
+        for (int i = 0; i < 8; i++) { //bring 8 ints down to 32 bytes
+            wordToBytes(state[i], output, i * 4);
+        }
+        return output;
+    }
 }
