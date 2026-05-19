@@ -136,10 +136,10 @@ public class ChaCha20 {
 			QuarterRound.apply(working, 3, 7, 11, 15);
 
 			// Dia
-			QuarterRound.apply(working, 0, 4, 8, 12);
-			QuarterRound.apply(working, 1, 5, 9, 13);
-			QuarterRound.apply(working, 2, 6, 10, 14);
-			QuarterRound.apply(working, 3, 7, 11, 15);
+			QuarterRound.apply(working, 0, 5, 10, 15);
+			QuarterRound.apply(working, 1, 6, 11, 12);
+			QuarterRound.apply(working, 2, 7, 8, 13);
+			QuarterRound.apply(working, 3, 4, 9, 14);
 			
 		}
 
@@ -179,6 +179,7 @@ public class ChaCha20 {
 		}
 
 		// word 12: block counter
+		state[12] = counter;
 
 		// words 13-15: nonce (12 bytes -> 3 little-endian words)
 		for( int i = 0 ; i<3; i++) {
@@ -319,7 +320,7 @@ public class ChaCha20 {
 	public static byte[] fromHex(String hex) {
 		byte[] bytes = new byte[hex.length()/2];
 		for (int i = 0; i < bytes.length; i++) {
-			
+			bytes[i] = (byte)Integer.parseInt(hex.substring(i*2, i*2 + 2), 16);
 		}
 		return bytes;
 	}

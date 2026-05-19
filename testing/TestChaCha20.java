@@ -149,6 +149,7 @@ public class TestChaCha20 {
 	private static void printResult(String label, boolean ok, String exp, String got) {
 		if (ok) {
 			System.out.printf("[PASS] %s%n", label);
+			passed++;
 		}
 		else {
 			System.out.printf("[FAIL] %s%n", label);

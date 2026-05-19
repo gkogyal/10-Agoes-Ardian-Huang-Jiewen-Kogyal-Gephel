@@ -2,6 +2,7 @@
 
 ## 2026-05-19
 * javaEncrypt/printResult and fix random/customCases
+* fixed bugs in CC20/TestCC20
 
 ## 2026-05-18
 * Added sectioning for test functions
