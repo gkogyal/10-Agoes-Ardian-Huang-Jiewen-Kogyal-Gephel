@@ -1,5 +1,8 @@
 # Devlog - Gephel Kogyal
 
+## 2026-05-19
+* javaEncrypt/printResult and fix random/customCases
+
 ## 2026-05-18
 * Added sectioning for test functions
 * randomCases + customCases
