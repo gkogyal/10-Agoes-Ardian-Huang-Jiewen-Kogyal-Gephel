@@ -3,6 +3,7 @@
 ## 2026-05-18
 * Added sectioning for test functions
 * randomCases + customCases
+* runTest, preview/truncate
 
 ## 2026-05-17
 * Added imports and main function for TestChaCha20

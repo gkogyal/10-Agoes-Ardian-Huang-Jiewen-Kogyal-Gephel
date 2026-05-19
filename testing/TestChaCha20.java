@@ -94,10 +94,35 @@ public class TestChaCha20 {
 	}
 
 
-
+	
 	private static void runTest(String plaintext) {
-		
-		
+		byte[] key = new byte[32];
+		byte[] nonce = new byte[12];
+		RNG.nextBytes(key);
+		RNG.nextBytes(nonce);
+
+		byte[] plaintextBytes = plaintext.getBytes(java.nio.charset.StandardCharsets.UTF_8);
+
+		String label = preview(plaintext);
+
+		// javax.crypto used for chacha20
+		byte[] jaCha = javaEncrypt(plaintextBytes, key, nonce);
+		if (javaCt == null) {
+			System.out.printf("  [SKIP] %s — javax.crypto unavailable%n", label);
+			return;
+		}
+
+		// my chacha20
+		byte[] myCha = ChaCha20.xcrypt(plaintextBytes, key, nonce, 1);
+
+		// printing results
+		printResult(label + " [ciphertext vs javax.crypto]", Array.equas(jaCha,myCha), ChaCha20.toHex(jaCha), ChaCha20.toHex(myCha));
+
+		// decrypting
+		byte[] recovered = ChaCha20.xcrypt(ourCt, key, nonce, 1);
+		boolean rtMatch  = Arrays.equals(plaintextBytes, recovered);
+
+		printResult(label + " [decrypting]", rtMatch, plaintext, new String(recovered, java.nio.charset.StandardCharsets.UTF_8));
 	}
 
 	private static void section(String str, int N) {
@@ -111,6 +136,17 @@ public class TestChaCha20 {
 
 	private static void section(String str) {
 		section(str,Math.max(30,str.length()+10));
+	}
+
+	private static String preview(String s) {
+		if (s.isEmpty()) return "<empty>";
+
+		String clean = s.replaceAll("[\\r\\n\\t]", " ");
+		return clean.length() <= 30 ? "\"" + clean + "\"" : "\"" + clean.substring(0, 27) + "...\"";
+	}
+	
+	private static String truncate(String s, int max) {
+		return s.length() <= max ? s : s.substring(0, max) + "…";
 	}
     
 }
