@@ -15,11 +15,7 @@ public class ChaCha20 {
 
 	  Process:
 	  		* Validate key
-<<<<<<< HEAD
 	  		* Generate encrypted text with xcrypt using given key and generated nonce
-=======
-	  		* Generate encrypted text with xcrypt using given key and generated nonce 
->>>>>>> 4bc4d1471c27eb0ef7c7a7118bfdb9a4dacd60ee
 			* Output encrypted text with nonce prepended
 
 	  Returns: byte[] output >> 12 byte nonce + encrypted text
@@ -40,11 +36,7 @@ public class ChaCha20 {
 	/*======== byte[] decrypt() ==========
 
 	  Inputs:  byte[] ciphertext	12-bit nonce + encrypted text
-<<<<<<< HEAD
 	  		   byte[] key
-=======
-	  		   byte[] key 			
->>>>>>> 4bc4d1471c27eb0ef7c7a7118bfdb9a4dacd60ee
 
 	  Process:
 	  		* Validate key and ciphertext
@@ -53,11 +45,7 @@ public class ChaCha20 {
 	  		* Extract encrypted using xcrypt() with the given key and extracted nonce
 
 	  Returns: byte[] X >> encrypted text
-<<<<<<< HEAD
 	  ====================*/
-=======
-	  ====================*/	
->>>>>>> 4bc4d1471c27eb0ef7c7a7118bfdb9a4dacd60ee
 	public static byte[] decrypt(byte[] ciphertext, byte[] key) {
 		validateKey(key);
 
@@ -89,26 +77,16 @@ public class ChaCha20 {
 	  		* Generate 64-byte keystream block
 	  		* XOR each input byte with corresponding keystream byte
 			* IUncrement block counter for each additional 64-byte block needed
-<<<<<<< HEAD
 
 	  Returns: byte[] output >> ChaCha20'd input
 	  ====================*/
-=======
-			
-	  Returns: byte[] output >> ChaCha20'd input
-	  ====================*/	
->>>>>>> 4bc4d1471c27eb0ef7c7a7118bfdb9a4dacd60ee
 	public static byte[] xcrypt(byte[] input, byte[] key, byte[] nonce, int counter) {
 		validateKey(key);
 		validateNonce(nonce);
 
 		byte[] output = new byte[input.length];
 		int processed = 0;
-<<<<<<< HEAD
 
-=======
-		
->>>>>>> 4bc4d1471c27eb0ef7c7a7118bfdb9a4dacd60ee
 
 		while (processed < input.length) {
 			// Build state for the current block counter and generate keystream
@@ -131,11 +109,7 @@ public class ChaCha20 {
 	/***********************************************/
 	/*************** CORE COMPONENTS ***************/
 	/***********************************************/
-<<<<<<< HEAD
 
-=======
-	
->>>>>>> 4bc4d1471c27eb0ef7c7a7118bfdb9a4dacd60ee
 	/*======== byte[] generateBlock() ==========
 
 	  Inputs:  int[] initialState
@@ -150,20 +124,7 @@ public class ChaCha20 {
 
 		// copy because need original for later step
 		int[] working = new int[Constants.STATE_WORDS];
-<<<<<<< HEAD
-<<<<<<< HEAD
 		System.arraycopy(initialState, 0, working, 0, Constants.STATE_WORDS);
-=======
-<<<<<<< HEAD
-		//System.arraycopy(initialState, 0, working, Constants.STATE_WORDS);
-=======
-		System.arraycopy(initialState, 0, working, 0, Constants.STATE_WORDS);
->>>>>>> 7cdd7068b1d379e04e0aeefff26834c23fdbb48e
->>>>>>> a7bb13c89c03b356d712736b51aa63ccd500d292
-=======
-		System.arraycopy(initialState, 0, working, 0, Constants.STATE_WORDS);
->>>>>>> 4bc4d1471c27eb0ef7c7a7118bfdb9a4dacd60ee
-
 		// 20 rounds -> 10 rounds of col/dia round
 		for (int i = 0; i<Constants.ROUNDS/2; i++) {
 
@@ -178,11 +139,7 @@ public class ChaCha20 {
 			QuarterRound.apply(working, 1, 6, 11, 12);
 			QuarterRound.apply(working, 2, 7, 8, 13);
 			QuarterRound.apply(working, 3, 4, 9, 14);
-<<<<<<< HEAD
 
-=======
-			
->>>>>>> 4bc4d1471c27eb0ef7c7a7118bfdb9a4dacd60ee
 		}
 
 		// Adding working state back to initial state (mod 2^32 so automatic integer overflow works)
@@ -190,11 +147,7 @@ public class ChaCha20 {
 			working[i] += initialState[i];
 		}
 
-<<<<<<< HEAD
 
-=======
-		
->>>>>>> 4bc4d1471c27eb0ef7c7a7118bfdb9a4dacd60ee
 		return wordsToBytes(working);
 	}
 
@@ -286,11 +239,7 @@ public class ChaCha20 {
 			throw new IllegalArgumentException("ChaCha20 requires 32-byte key, got: " + (key == null ? "null" : key.length) );
 		}
 	}
-<<<<<<< HEAD
 
-=======
-	
->>>>>>> 4bc4d1471c27eb0ef7c7a7118bfdb9a4dacd60ee
 	/*****************************************************/
 	/*************** BYTE/WORD CONVERSION ****************/
 	/*****************************************************/
@@ -374,10 +323,5 @@ public class ChaCha20 {
 		}
 		return bytes;
 	}
-<<<<<<< HEAD
 
 }
-=======
-	
-}
->>>>>>> 4bc4d1471c27eb0ef7c7a7118bfdb9a4dacd60ee

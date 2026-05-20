@@ -19,7 +19,7 @@ public class TestAES256 {
         int[] expanded = AESKeySchedule.expandKey(masterKey);
 
         byte[] cipher = aes.encrypt(plainText, expanded);
-        
+
         System.out.print("Encrypted: ");
         for (byte b : cipher) {
             String hex = Integer.toHexString(0xff & b);
@@ -38,12 +38,4 @@ public class TestAES256 {
             System.out.println("Status: broken");
         }
     }
-<<<<<<< HEAD
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> 92cd0e6c86445aa1d3baf9ea7e35bbda2f693766
-=======
-}
->>>>>>> 4bc4d1471c27eb0ef7c7a7118bfdb9a4dacd60ee
