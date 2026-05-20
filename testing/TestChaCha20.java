@@ -1,8 +1,11 @@
 package testing;
 
 import chacha.ChaCha20;
+<<<<<<< HEAD
+=======
 
 
+>>>>>>> 057214c20482cd3d21f460288381345978e85e74
 import javax.crypto.Cipher;
 import javax.crypto.spec.ChaCha20ParameterSpec;
 import javax.crypto.spec.SecretKeySpec;

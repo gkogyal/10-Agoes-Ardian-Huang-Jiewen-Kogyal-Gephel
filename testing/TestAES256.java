@@ -3,6 +3,12 @@ package testing;
 import aes.AES256;
 import aes.AESKeySchedule;
 
+/*
+COMMANDS
+javac -cp src src/aes/*.java testing/*.java
+java -cp "src:." testing.TestAES256
+*/
+  
 public class TestAES256 {
 
     public static void main(String[] args) {
