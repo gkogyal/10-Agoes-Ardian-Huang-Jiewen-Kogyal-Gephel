@@ -37,5 +37,43 @@ public class TestSHA256 {
             failed++;
             return;
         }
+        boolean pass = ours.equals(expected);
+        String label;
+        if (input.length()>40) {
+            label = input.substring(0, 37) + "...";
+        } else {
+            label = input;
+        }
+        String result;
+        if (pass) {
+            result = "PASS";
+        } else {
+            result ="FAIL";
+        }
+        System.out.println(result + " (" + inputBytes.length + " bytes) \"" + label + "\"");
+        if (!pass) {
+            System.out.println(" expected: " + expected);
+            System.out.println(" ours: " + ours);
+        }
+        if (pass) {
+            passed++;
+        } else {
+            failed++;
+        }
+    }
+    private static String[] staticCases() {
+        return new String[]{
+                "",
+                "a", //exactly one byte
+                "abc", 
+                "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq",
+                "The quick brown fox jumps over the lazy dog",
+                "!@#$%^&*()_+-=[]{}|;':\",./<>?",//for special chars
+                "A".repeat(55), 
+                "A".repeat(56),
+                "A".repeat(64),//exactly 1 block of input
+                "A".repeat(1000)
+        };
+    }
 }
 
