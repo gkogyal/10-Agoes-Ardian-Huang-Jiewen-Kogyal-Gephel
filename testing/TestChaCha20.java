@@ -1,7 +1,6 @@
 package testing;
 
 import chacha.ChaCha20;
-
 import javax.crypto.Cipher;
 import javax.crypto.spec.ChaCha20ParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
@@ -32,7 +31,7 @@ public class TestChaCha20 {
 
 		section("RANDOM TESTS (" + randomCases.length + " cases)");
 		for (String str: randomCases) runTest(str);
-		
+
 		section("CUSTOM TESTS (" + customCases.length + " cases)");
 		for (String str: customCases) runTest(str);
 
@@ -55,14 +54,14 @@ public class TestChaCha20 {
 	}
 
 	private static String[] randomCases() {
-	
+
 		Scanner sc = new Scanner(System.in);
 		System.out.println("\nHow many random test cases? ");
 
 		int count = 10;
 		try {count = Integer.parseInt(sc.nextLine().trim());}
 		catch (Exception e) {System.out.println("Invalid number, defaulting to 10.");}
-		
+
 
 		String[] randomStrings = new String[count];
 
@@ -74,9 +73,10 @@ public class TestChaCha20 {
 				bytes[j] = (byte)(32 + RNG.nextInt(95));
 			}
 
-			randomStrings[i] = new String(bytes, java.nio.charset.StandardCharsets.US_ASCII);	
+			randomStrings[i] = new String(bytes, java.nio.charset.StandardCharsets.US_ASCII);
 		}
-		
+
+
 		return randomStrings;
 	}
 
@@ -91,6 +91,7 @@ public class TestChaCha20 {
 
 			System.out.println("=".repeat(30));
 			System.out.print("Enter your input (QUIT to escape): ");
+			customCases.add(scn.nextLine());
 			String line = scn.nextLine();
 			System.out.println("=".repeat(30) + "\n");
 
@@ -101,8 +102,6 @@ public class TestChaCha20 {
 		return customCases.toArray(new String[0]);
 	}
 
-
-	
 	private static void runTest(String plaintext) {
 		byte[] key = new byte[32];
 		byte[] nonce = new byte[12];
@@ -178,9 +177,9 @@ public class TestChaCha20 {
 		String clean = s.replaceAll("[\\r\\n\\t]", " ");
 		return clean.length() <= 30 ? "\"" + clean + "\"" : "\"" + clean.substring(0, 27) + "...\"";
 	}
-	
+
 	private static String truncate(String s, int max) {
 		return s.length() <= max ? s : s.substring(0, max) + "…";
 	}
-    
+
 }
