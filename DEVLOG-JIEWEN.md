@@ -54,3 +54,7 @@
 * Began coding `TestSHA256.java` file in `testing` directory. This will serve as a main visual indicator for how our code functions and test case checking. 
 * Filled in the static portion of `TestSHA256.java`: `section`
 * `runTest` compares my `SHA256.hash(...)` output against Java's built-in `MessageDigest.getInstance("SHA-256")`. Using a library in tests for verification is fine I think since the proposal's "no crypto libraries" rule is about the implementation, not how we check it. Gephel did the same with `javax.crypto.Cipher` in `TestChaCha20`
+
+## 2026-05-20
+
+* Imported HexFormat which allows me to handle byte array to hex string conversion; previously, I had planned on using a function but this is more convenient
