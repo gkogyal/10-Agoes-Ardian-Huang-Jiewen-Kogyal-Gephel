@@ -1,5 +1,11 @@
 # Devlog - Ardian Agoes
 
+## 2026-05-19
+
+* Fixed an issue where  Git conflict markers (`<<<<<<< HEAD`, `=======`, `>>>>>>>`) made during a branch merge messed up our code and halted progress.
+* Corrected a type error in the `encrypt` parameters and fixed a loop boundary in `decrypt` where intermediate rounds were incorrectly numbered.
+* Wrote a tester in `AESTester.java` inside the `testing/` directory.
+
 ## 2026-05-18
 
 * Fixed errors in `AESKeySchedule.java`, including missing parentheses and XOR operators.
