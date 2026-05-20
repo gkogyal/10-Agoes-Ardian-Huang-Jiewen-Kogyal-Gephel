@@ -58,3 +58,4 @@
 ## 2026-05-20
 
 * Imported HexFormat which allows me to handle byte array to hex string conversion; previously, I had planned on using a function but this is more convenient
+* Began randomCases() function on testing file

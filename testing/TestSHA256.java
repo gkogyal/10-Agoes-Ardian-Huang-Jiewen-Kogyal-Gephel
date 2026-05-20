@@ -76,5 +76,12 @@ public class TestSHA256 {
                 "A".repeat(1000)
         };
     }
+    private static String[] randomCases() {
+        Scanner sc = new Scanner(System.in);
+		System.out.println("\nHow many random test cases? ");
+		int count = 10;
+		try {count = Integer.parseInt(sc.nextLine().trim());}
+		catch (Exception e) {System.out.println("Invalid number, defaulting to 10.");}
+    }
 }
 
