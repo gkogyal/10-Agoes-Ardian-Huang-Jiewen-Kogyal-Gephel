@@ -118,3 +118,61 @@ public class TestSHA256 {
 		// printing results
 		printResult(label + " [hash vs MessageDigest]", Arrays.equals(javaSha,mySha), HexFormat.of().formatHex(javaSha), HexFormat.of().formatHex(mySha), N);
 	}
+
+	private static byte[] javaHash(byte[] input) {
+		try {
+			return MessageDigest.getInstance("SHA-256").digest(input);
+		}
+		catch (Exception e) {
+			System.out.println("[ERRORR] MessageDigest: " + e.getMessage());
+			return null;
+		}
+	}
+
+	private static void printResult(String label, boolean ok, String exp, String got, int N) {
+		String nu = (N/2) + (N%2==0 ? "a" : "b");
+		if (ok) {
+			System.out.printf(nu + ": [PASS] %s%n", label);
+			passed++;
+		}
+		else {
+			System.out.printf(nu + ": [FAIL] %s%n", label);
+			System.out.printf("	  exp: %s%n", truncate(exp, 80));
+			System.out.printf("	  got: %s%n", truncate(got, 80));
+			failed++;
+		}
+	}
+
+	private static String line(int N) {
+		return "=".repeat(N);
+	}
+
+	private static void section(String a, String b, String c) {
+		System.out.print(a + b + c);
+	}
+
+	private static void section(String str, int N) {
+		N = Math.max(N,str.length()+10);
+
+		String div = line(N) + "\n";
+		String mid = " ".repeat((N - str.length())/2);
+
+		System.out.print(div + mid + str + "\n" + div + "\n");
+	}
+
+	private static void section(String str) {
+		section(str,Math.max(30,str.length()+10));
+	}
+
+	private static String preview(String s) {
+		if (s.isEmpty()) return "<empty>";
+
+		String clean = s.replaceAll("[\\r\\n\\t]", " ");
+		return clean.length() <= 30 ? "\"" + clean + "\"" : "\"" + clean.substring(0, 27) + "...\"";
+	}
+
+	private static String truncate(String s, int max) {
+		return s.length() <= max ? s : s.substring(0, max) + "…" + " ( " + (max-s.length()) + "more)";
+	}
+
+}
