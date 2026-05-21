@@ -1,67 +1,41 @@
 package testing;
 import sha.SHA256;
-import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.SecureRandom;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HexFormat;
+import java.util.Scanner;
 public class TestSHA256 {
     private static int passed = 0;
     private static int failed = 0;
     private static final SecureRandom RNG = new SecureRandom();
+    private static final Scanner SCANNER = new Scanner(System.in);
+
     public static void main(String[] args) {
         section("SHA-256 Test Suite");
         String[] staticCases = staticCases();
         String[] randomCases = randomCases();
         String[] customCases = customCases();
-        section("STATIC TESTS (" + staticCases.length + " cases)");
-        for (String str : staticCases) runTest(str);
-        section("RANDOM TESTS (" + randomCases.length + " cases)");
-        for (String str : randomCases) runTest(str);
-        section("CUSTOM TESTS (" + customCases.length + " cases)");
-        for (String str : customCases) runTest(str);
-        section("Passed: " + passed + "   Failed: " + failed);
+		section("STATIC TESTS (" + staticCases.length + " cases)");
+		for (int i  = 0; i<staticCases.length; i++) {
+			runTest(staticCases[i],2*i);
+		}
+		System.out.print("\n");
+		section("RANDOM TESTS (" + randomCases.length + " cases)");
+		for (int i  = 0; i<randomCases.length; i++) {
+			runTest(randomCases[i],2*i);
+		}
+		System.out.print("\n");
+		section("CUSTOM TESTS (" + customCases.length + " cases)");
+		for (int i  = 0; i<customCases.length; i++) {
+			runTest(customCases[i],2*i);
+		}
+		System.out.print("\n");
+		section("Passed: " + passed  + "   Failed " + failed);
     }
 
-    private static void section(String header) {
-        System.out.println();
-        System.out.println("--- " + header + " ---");
-    }
-
-    private static void runTest(String input) {
-        byte[] inputBytes = input.getBytes(StandardCharsets.UTF_8);
-        String ours = hexFormat.of().formatHex(SHA256.hash(inputBytes));
-        String expected;
-        try {
-            expected = hexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(inputBytes));
-        } catch (Exception e) {
-            System.out.println("ERROR: " + e.getMessage());
-            failed++;
-            return;
-        }
-        boolean pass = ours.equals(expected);
-        String label;
-        if (input.length()>40) {
-            label = input.substring(0, 37) + "...";
-        } else {
-            label = input;
-        }
-        String result;
-        if (pass) {
-            result = "PASS";
-        } else {
-            result ="FAIL";
-        }
-        System.out.println(result + " (" + inputBytes.length + " bytes) \"" + label + "\"");
-        if (!pass) {
-            System.out.println(" expected: " + expected);
-            System.out.println(" ours: " + ours);
-        }
-        if (pass) {
-            passed++;
-        } else {
-            failed++;
-        }
-    }
     private static String[] staticCases() {
         return new String[]{
                 "",
@@ -76,12 +50,71 @@ public class TestSHA256 {
                 "A".repeat(1000)
         };
     }
-    private static String[] randomCases() {
-        Scanner sc = new Scanner(System.in);
-		System.out.println("\nHow many random test cases? ");
-		int count = 10;
-		try {count = Integer.parseInt(sc.nextLine().trim());}
-		catch (Exception e) {System.out.println("Invalid number, defaulting to 10.");}
-    }
-}
 
+	private static String[] randomCases() {
+
+		System.out.print("How many random test cases?: ");
+
+		int count = 10;
+		try {count = Integer.parseInt(SCANNER.nextLine().trim());}
+		catch (Exception e) {System.out.println("Invalid number, defaulting to 10.");}
+
+
+		String[] randomStrings = new String[count];
+
+		for(int i = 0; i<count; i++ ) {
+			int length = RNG.nextInt(291) + 10; // 10-300 chars
+
+			byte[] bytes = new byte[length];
+			for (int j = 0; j < length; j++) {
+				bytes[j] = (byte)(32 + RNG.nextInt(95));
+			}
+
+			randomStrings[i] = new String(bytes, java.nio.charset.StandardCharsets.US_ASCII);
+		}
+
+
+		return randomStrings;
+	}
+
+
+	private static String[] customCases() {
+		// should quit asking for more only if given just "QUIT"
+
+		ArrayList<String> customCases = new ArrayList<String>();
+
+		System.out.println("\nEnter inputs below (QUIT to escape):");
+
+		int i = 0;
+		while(true) {
+
+			System.out.print("  " + (i+1) + ": ");
+			String line = SCANNER.nextLine();
+
+			if (line.equals("QUIT")) break;
+			customCases.add(line); i++;
+		}
+
+		System.out.print("\n");
+
+		return customCases.toArray(new String[0]);
+	}
+
+	private static void runTest(String input, int N) {
+		byte[] inputBytes = input.getBytes(java.nio.charset.StandardCharsets.UTF_8);
+
+		String label = preview(input);
+
+		// MessageDigest used for sha-256 reference
+		byte[] javaSha = javaHash(inputBytes);
+		if (javaSha == null) {
+			System.out.printf("[SKIP] %s — MessageDigest unavailable%n", label);
+			return;
+		}
+
+		// my sha-256
+		byte[] mySha = SHA256.hash(inputBytes);
+
+		// printing results
+		printResult(label + " [hash vs MessageDigest]", Arrays.equals(javaSha,mySha), HexFormat.of().formatHex(javaSha), HexFormat.of().formatHex(mySha), N);
+	}
