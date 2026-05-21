@@ -59,3 +59,6 @@
 
 * Imported HexFormat which allows me to handle byte array to hex string conversion; previously, I had planned on using a function but this is more convenient
 * Began randomCases() function on testing file
+* Restructured `TestSHA256.java` to mirror Gephel's `TestChaCha20.java` layout although I kept my own SHA-specific static cases (with the 55/56/64-byte padding boundary tests) and used `HexFormat.of().formatHex(...)` instead of his `ChaCha20.toHex(...)`
+* A few differences: `runTest` does only **one** sub-test per case (`hash vs MessageDigest`) instead of his two (ciphertext + decrypt roundtrip) because hashes have no decrypt step. That's why all my case numbers come out as `0a, 1a, 2a...` and never `Nb`
+* Tested: 15/15 PASS (10 static + 5 random) when matched against `MessageDigest.getInstance("SHA-256")` as ref
