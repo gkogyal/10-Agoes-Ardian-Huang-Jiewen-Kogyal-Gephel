@@ -15,7 +15,7 @@ public class ChaCha20 {
 
 	  Process:
 	  		* Validate key
-	  		* Generate encrypted text with xcrypt using given key and generated nonce 
+	  		* Generate encrypted text with xcrypt using given key and generated nonce
 			* Output encrypted text with nonce prepended
 
 	  Returns: byte[] output >> 12 byte nonce + encrypted text
@@ -36,7 +36,7 @@ public class ChaCha20 {
 	/*======== byte[] decrypt() ==========
 
 	  Inputs:  byte[] ciphertext	12-bit nonce + encrypted text
-	  		   byte[] key 			
+	  		   byte[] key
 
 	  Process:
 	  		* Validate key and ciphertext
@@ -45,7 +45,7 @@ public class ChaCha20 {
 	  		* Extract encrypted using xcrypt() with the given key and extracted nonce
 
 	  Returns: byte[] X >> encrypted text
-	  ====================*/	
+	  ====================*/
 	public static byte[] decrypt(byte[] ciphertext, byte[] key) {
 		validateKey(key);
 
@@ -77,16 +77,16 @@ public class ChaCha20 {
 	  		* Generate 64-byte keystream block
 	  		* XOR each input byte with corresponding keystream byte
 			* IUncrement block counter for each additional 64-byte block needed
-			
+
 	  Returns: byte[] output >> ChaCha20'd input
-	  ====================*/	
+	  ====================*/
 	public static byte[] xcrypt(byte[] input, byte[] key, byte[] nonce, int counter) {
 		validateKey(key);
 		validateNonce(nonce);
 
 		byte[] output = new byte[input.length];
 		int processed = 0;
-		
+
 
 		while (processed < input.length) {
 			// Build state for the current block counter and generate keystream
@@ -109,7 +109,7 @@ public class ChaCha20 {
 	/***********************************************/
 	/*************** CORE COMPONENTS ***************/
 	/***********************************************/
-	
+
 	/*======== byte[] generateBlock() ==========
 
 	  Inputs:  int[] initialState
@@ -124,8 +124,7 @@ public class ChaCha20 {
 
 		// copy because need original for later step
 		int[] working = new int[Constants.STATE_WORDS];
-		System.arraycopy(initialState, 0, working, Constants.STATE_WORDS);
-
+		System.arraycopy(initialState, 0, working, 0, Constants.STATE_WORDS);
 		// 20 rounds -> 10 rounds of col/dia round
 		for (int i = 0; i<Constants.ROUNDS/2; i++) {
 
@@ -136,11 +135,11 @@ public class ChaCha20 {
 			QuarterRound.apply(working, 3, 7, 11, 15);
 
 			// Dia
-			QuarterRound.apply(working, 0, 4, 8, 12);
-			QuarterRound.apply(working, 1, 5, 9, 13);
-			QuarterRound.apply(working, 2, 6, 10, 14);
-			QuarterRound.apply(working, 3, 7, 11, 15);
-			
+			QuarterRound.apply(working, 0, 5, 10, 15);
+			QuarterRound.apply(working, 1, 6, 11, 12);
+			QuarterRound.apply(working, 2, 7, 8, 13);
+			QuarterRound.apply(working, 3, 4, 9, 14);
+
 		}
 
 		// Adding working state back to initial state (mod 2^32 so automatic integer overflow works)
@@ -148,7 +147,7 @@ public class ChaCha20 {
 			working[i] += initialState[i];
 		}
 
-		
+
 		return wordsToBytes(working);
 	}
 
@@ -179,6 +178,7 @@ public class ChaCha20 {
 		}
 
 		// word 12: block counter
+		state[12] = counter;
 
 		// words 13-15: nonce (12 bytes -> 3 little-endian words)
 		for( int i = 0 ; i<3; i++) {
@@ -239,7 +239,7 @@ public class ChaCha20 {
 			throw new IllegalArgumentException("ChaCha20 requires 32-byte key, got: " + (key == null ? "null" : key.length) );
 		}
 	}
-	
+
 	/*****************************************************/
 	/*************** BYTE/WORD CONVERSION ****************/
 	/*****************************************************/
@@ -319,9 +319,9 @@ public class ChaCha20 {
 	public static byte[] fromHex(String hex) {
 		byte[] bytes = new byte[hex.length()/2];
 		for (int i = 0; i < bytes.length; i++) {
-			
+			bytes[i] = (byte)Integer.parseInt(hex.substring(i*2, i*2 + 2), 16);
 		}
 		return bytes;
 	}
-	
+
 }
