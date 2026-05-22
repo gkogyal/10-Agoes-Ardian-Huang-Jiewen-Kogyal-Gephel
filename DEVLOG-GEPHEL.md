@@ -1,5 +1,8 @@
 # Devlog - Gephel Kogyal
 
+## 2026-05-20
+* greatly enhanced user interface and user experience; finalized template for test suite
+
 ## 2026-05-19
 * javaEncrypt/printResult and fix random/customCases
 * fixed bugs in CC20/TestCC20
