@@ -68,3 +68,6 @@
 * Began coding `Vault.java`, which is meant to be the cli app that ties everything tgthr
 * CLI loop with 5 commands, `add`, `list`, `get`, `del`, `quit` (plus `help`). All operate on an in-memory `ArrayList<VaultEntry>` for now. no file persistence yet.
 * Fixed a compile bug in `VaultEntry.java`
+
+## 2026-05-22
+* Continued working on `Vault.java`, added addEntry() function`

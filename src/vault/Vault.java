@@ -76,6 +76,15 @@ public class Vault {
             System.out.println("  " + (i + 1) + ". " + database.get(i).site);
         }
     }
-
-    //UNFINISHED still gotta add some more functionality here 
+    private static void getEntry() {
+        System.out.print("site to retrieve: ");
+        String target = scanner.nextLine();
+        for (VaultEntry e : database) {
+            if (e.site.equalsIgnoeCase(target)) {
+                System.out.println("username: " + e.username);
+                System.out.println("password: " + e.encryptedPassword);
+                return;
+            }
+        }
+    }
 }
