@@ -62,6 +62,9 @@
 * Restructured `TestSHA256.java` to mirror Gephel's `TestChaCha20.java` layout although I kept my own SHA-specific static cases (with the 55/56/64-byte padding boundary tests) and used `HexFormat.of().formatHex(...)` instead of his `ChaCha20.toHex(...)`
 * A few differences: `runTest` does only **one** sub-test per case (`hash vs MessageDigest`) instead of his two (ciphertext + decrypt roundtrip) because hashes have no decrypt step. That's why all my case numbers come out as `0a, 1a, 2a...` and never `Nb`
 * Tested: 15/15 PASS (10 static + 5 random) when matched against `MessageDigest.getInstance("SHA-256")` as ref
+
 ## 2026-05-21
 
-* Began coding `Vault.java` 
+* Began coding `Vault.java`, which is meant to be the cli app that ties everything tgthr
+* CLI loop with 5 commands, `add`, `list`, `get`, `del`, `quit` (plus `help`). All operate on an in-memory `ArrayList<VaultEntry>` for now. no file persistence yet.
+* Fixed a compile bug in `VaultEntry.java`
