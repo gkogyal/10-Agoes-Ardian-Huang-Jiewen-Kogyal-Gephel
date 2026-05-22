@@ -1,6 +1,7 @@
 package sha;
 
 public class SHA256 {
+    public static boolean verbose = false;
     static int rotr(int x, int n) { //rotate right
         return (x >>> n) | (x << (32 - n)); // shifts bits over and wraps the ones that fall off back to the front
     }
@@ -68,6 +69,10 @@ public class SHA256 {
     static void compress(int[] state, int[] W) {
         int a = state[0], b = state[1], c = state[2], d = state[3];
         int e = state[4], f = state[5], g = state[6], h = state[7];
+        if (verbose) {
+            System.out.println("-- block compression starts here --");
+            System.out.println("init: a=" + Integer.toHexString(a) + " b=" + Integer.toHexString(b) + " c=" + Integer.toHexString(c) + " d=" + Integer.toHexString(d) + " e=" + Integer.toHexString(e) + " f=" + Integer.toHexString(f) + " g=" + Integer.toHexString(g) + " h=" + Integer.toHexString(h));
+        }
         for (int i = 0; i < 64; i++) {
             int nextA = h + bigSigma1(e) + ch(e, f, g) + Constants.K[i] + W[i] + bigSigma0(a) + maj(a, b, c);
             int nextE = d + h + bigSigma1(e) + ch(e, f, g) + Constants.K[i] + W[i];
@@ -79,6 +84,9 @@ public class SHA256 {
             c = b;
             b = a;
             a = nextA;
+            if (verbose) {
+                System.out.println("round " + i + ": a=" + Integer.toHexString(a) + " b=" + Integer.toHexString(b) + " c=" + Integer.toHexString(c) + " d=" + Integer.toHexString(d) + " e=" + Integer.toHexString(e) + " f=" + Integer.toHexString(f) + " g=" + Integer.toHexString(g) + " h=" + Integer.toHexString(h));
+            }
         }
         state[0] = state[0] + a;
         state[1] = state[1] + b;
@@ -88,5 +96,19 @@ public class SHA256 {
         state[5] = state[5] + f;
         state[6] = state[6] + g;
         state[7] = state[7] + h;
+    }
+    public static byte[] hash(byte[] input) {
+        byte[] padded = pad(input);
+        int[] state = new int[8];
+        System.arraycopy(Constants.H, 0, state, 0, 8);
+        for (int i = 0; i < padded.length; i += 64) {
+            int[] W = messageSchedule(padded, i);
+            compress(state, W); //makes state stay in place
+        }
+        byte[] output = new byte[32];
+        for (int i = 0; i < 8; i++) { //bring 8 ints down to 32 bytes
+            wordToBytes(state[i], output, i * 4);
+        }
+        return output;
     }
 }

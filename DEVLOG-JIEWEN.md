@@ -36,10 +36,35 @@
 * Added `bytesToWord(byte[] arr, int offset)`; pulled the 4-byte big-endian unpacking out of `messageSchedule` so the loop reads cleanly.
 > Did also hit a parenthesis bug where `& 0xff` was inside the index (`arr[offset & 0xff]`) instead of masking the byte value (`(arr[offset] & 0xff)`); fixed
 
-### 5-17
+## 5-17
 
 * Changed `messageSchedule` a little bit, the first loop is now a one-liner with the new bytesToWords fxn
 * Added `wordToBytes(int word, byte[] arr, int offset)`, the inverse of the other fxn. Writes a 32-bit int into 4 consecutive bytes (big-endian). Not called yet but needed later when the 8-word final hash state has to be serialized into a `byte[32]` in `hash()` 
 * Added `compress(int[] state, int[] W)` to `src/sha/SHA256.java` which is the the SHA-256 compression function (FIPS 180-4 6.2.2). Takes the running 8-word state and the 64-word message schedule from one block, runs 64 rounds mixing in `K[i]` and `W[i]`, and adds the result back into the state in place
 * After the loop, the new working vars are *added* (not assigned) into the state. This is why the function is called "compress" and not "encrypt"
 > Also worth noting that I hit a bug in the variable shift where i originally wrote it top-down (`a = nextA; b = a; c = b`), but `b = a` overwrites a before c can read it, so a-d all collapsed to `nextA`. Fixed by reversing the order: `h = g; g = f; f = e; e = nextE; d = c; c = b; b = a; a = nextA;` so every read now happens before its overwrite.
+
+## 2026-05-18
+
+* Created `hash(byte[] input)` function, which is intended to create the final cryptographic hash by calling upon the other functions and rip the final 8 integers to 32 bytes.
+* Added verbose option to visualize the process for the SHA-256 algorithm.
+
+## 2026-05-19
+
+* Began coding `TestSHA256.java` file in `testing` directory. This will serve as a main visual indicator for how our code functions and test case checking. 
+* Filled in the static portion of `TestSHA256.java`: `section`
+* `runTest` compares my `SHA256.hash(...)` output against Java's built-in `MessageDigest.getInstance("SHA-256")`. Using a library in tests for verification is fine I think since the proposal's "no crypto libraries" rule is about the implementation, not how we check it. Gephel did the same with `javax.crypto.Cipher` in `TestChaCha20`
+
+## 2026-05-20
+
+* Imported HexFormat which allows me to handle byte array to hex string conversion; previously, I had planned on using a function but this is more convenient
+* Began randomCases() function on testing file
+* Restructured `TestSHA256.java` to mirror Gephel's `TestChaCha20.java` layout although I kept my own SHA-specific static cases (with the 55/56/64-byte padding boundary tests) and used `HexFormat.of().formatHex(...)` instead of his `ChaCha20.toHex(...)`
+* A few differences: `runTest` does only **one** sub-test per case (`hash vs MessageDigest`) instead of his two (ciphertext + decrypt roundtrip) because hashes have no decrypt step. That's why all my case numbers come out as `0a, 1a, 2a...` and never `Nb`
+* Tested: 15/15 PASS (10 static + 5 random) when matched against `MessageDigest.getInstance("SHA-256")` as ref
+
+## 2026-05-21
+
+* Began coding `Vault.java`, which is meant to be the cli app that ties everything tgthr
+* CLI loop with 5 commands, `add`, `list`, `get`, `del`, `quit` (plus `help`). All operate on an in-memory `ArrayList<VaultEntry>` for now. no file persistence yet.
+* Fixed a compile bug in `VaultEntry.java`
