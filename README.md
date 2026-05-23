@@ -82,8 +82,9 @@ Intentionally **vulnerable environment** as a container for an attack simulation
 │   │
 │   ├── aes/
 │   │   ├── AES256.java           # AES-256 implementation
-│   │   ├── Padding.java           # AES-256 padding
+│   │   ├── Padding.java          # AES-256 padding
 │   │   ├── AESKeySchedule.java   # 15 Rijndael key expansions
+│   │   ├── AESCipher.java        # AES-256 encryption
 │   │   └── Constants.java        # S-Box, Inverse S-Box, RCON values
 │   │
 │   ├── sha/
