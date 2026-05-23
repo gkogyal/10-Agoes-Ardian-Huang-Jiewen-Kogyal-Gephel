@@ -1,5 +1,9 @@
 # Devlog - Gephel Kogyal
 
+## 2026-05-22
+* added generalized prompting for vault using Predicate
+* added encrypt/decrypting stored ciphersting
+
 ## 2026-05-20
 * greatly enhanced user interface and user experience; finalized template for test suite
 
