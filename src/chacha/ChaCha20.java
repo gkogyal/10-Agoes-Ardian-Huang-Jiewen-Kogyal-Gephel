@@ -353,5 +353,28 @@ public class ChaCha20 {
 		}
 	}
 
+
+	private static void printXorTable(byte[] input, byte[] keystream, byte[] output, int inputOffset, int blockLen) {
+		int cols = 16;
+
+		for (int base = 0; base < blockLen; base += cols) {
+
+			int end = Math.min(base + cols, blockLen);
+
+			System.out.print("    in:  ");
+			for (int i = base; i < end; i++) System.out.printf("%02x ", input[inputOffset + i] & 0xFF);
+			System.out.println();
+
+			System.out.print("    key: ");
+			for (int i = base; i < end; i++) System.out.printf("%02x ", keystream[i] & 0xFF);
+			System.out.println();
+
+			System.out.print("    out: ");
+			for (int i = base; i < end; i++) System.out.printf("%02x ", output[inputOffset + i] & 0xFF);
+			System.out.println();
+
+			if (end < blockLen) System.out.println();
+		}
+	}
 	
 }

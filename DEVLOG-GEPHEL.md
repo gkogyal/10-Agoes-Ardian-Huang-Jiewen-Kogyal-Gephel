@@ -4,6 +4,7 @@
 * implemented verbose option in chacha20
 * implemented printing word, stategrid, bytes list in chacha20
 * added verbosechacha20 for testing the verbose option
+* added printing xorTable option
 
 ## 2026-05-23 (sick)
 
