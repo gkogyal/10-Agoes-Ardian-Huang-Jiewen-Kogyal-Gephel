@@ -49,7 +49,7 @@ public class VerboseChaCha20 {
 
 		section("Encryption Trace");
 
-		ChaCha20.verbose = false;
+		ChaCha20.verbose = true;
 
 		byte[] ciphertext = ChaCha20.xcrypt(plaintextBytes, key, nonce, 1);
 
@@ -84,7 +84,7 @@ public class VerboseChaCha20 {
 		System.out.println("  Recovered : \"" + recoveredStr + "\"");
 		System.out.println();
 
-		if (match) {
+		if (recoveredQ) {
 			System.out.println(" [PASS] Successful recovery.");
 		}
 		 else {

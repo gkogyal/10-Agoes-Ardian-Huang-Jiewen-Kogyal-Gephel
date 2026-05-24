@@ -89,16 +89,47 @@ public class ChaCha20 {
 		byte[] output = new byte[input.length];
 		int processed = 0;
 
+		
+		int totalBlocks = (input.length + Constants.BLOCK_BYTES - 1) / Math.max(input.length == 0 ? 1 : Constants.BLOCK_BYTES, 1);
+		int numBlocks = (input.length == 0) ? 0 : ((input.length + Constants.BLOCK_BYTES - 1) / Constants.BLOCK_BYTES);
+
+
+		if (verbose) {
+			System.out.println();
+			System.out.println(" xcrypt: " + input.length + " byte(s) across " + Math.max(numBlocks, 1) + " block(s) of up to " + Constants.BLOCK_BYTES + " bytes each");
+		}
 
 		while (processed < input.length) {
+			int blockNum = counter;
+			
+			if (verbose) {
+				System.out.println();
+				System.out.printf (" BLOCK %d  (counter = %d, bytes %d-%d of %d)%n", blockNum, counter, processed, Math.min(processed + Constants.BLOCK_BYTES, input.length) - 1, input.length);
+			}
+
 			// Build state for the current block counter and generate keystream
 			int[] state = buildInitialState(key, nonce, counter);
 			byte[] keystream = generateBlock(state);
 
 			// XOR as many bytes as available (up to 64)
 			int blockLen = Math.min(Constants.BLOCK_BYTES, input.length - processed);
+
+			if (verbose) {
+				System.out.println();
+				System.out.printf(" Keystream bytes [0..%d]:%n", blockLen - 1);
+				printBytes(keystream, blockLen, 16);
+				System.out.println();
+				System.out.println(" XOR  plaintext ^ keystream  ->  output:");
+				System.out.println("    (showing up to first 16 bytes per row)");
+				
+			}
+			
 			for (int i = 0; i < blockLen; i++) {
 				output[processed + i] = (byte)(input[processed + i] ^ keystream[i]);
+			}
+
+			if (verbose) {
+				printXorTable(input, keystream, output, processed, blockLen);
 			}
 
 			processed += blockLen;
@@ -127,6 +158,15 @@ public class ChaCha20 {
 		// copy because need original for later step
 		int[] working = new int[Constants.STATE_WORDS];
 		System.arraycopy(initialState, 0, working, 0, Constants.STATE_WORDS);
+
+		if (verbose) {
+			System.out.println("\n generateBlock: 20 rounds = 10 x (column-round + diagonal-round\n");
+
+			System.out.println(" Initial Working state:");
+
+			printStateGrid(working);
+		}
+		
 		// 20 rounds -> 10 rounds of col/dia round
 		for (int i = 0; i<Constants.ROUNDS/2; i++) {
 
@@ -136,19 +176,36 @@ public class ChaCha20 {
 			QuarterRound.apply(working, 2, 6, 10, 14);
 			QuarterRound.apply(working, 3, 7, 11, 15);
 
+			if (verbose) {
+				System.out.printf(" After column-round   %2d/10:%n", i + 1);
+				printStateGrid(working);
+			}
+
 			// Dia
 			QuarterRound.apply(working, 0, 5, 10, 15);
 			QuarterRound.apply(working, 1, 6, 11, 12);
 			QuarterRound.apply(working, 2, 7, 8, 13);
 			QuarterRound.apply(working, 3, 4, 9, 14);
 
+			if (verbose) {
+				System.out.printf(" After diagonal-round %2d/10:%n", i + 1);
+				printStateGrid(working);
+			}
+
 		}
+
+		
 
 		// Adding working state back to initial state (mod 2^32 so automatic integer overflow works)
 		for (int i = 0; i<Constants.STATE_WORDS; i++) {
 			working[i] += initialState[i];
 		}
 
+
+		if (verbose) {
+			System.out.println(" Final addition: working += initial  (mod 2^32)");
+			printStateGrid(working);
+		}
 
 		return wordsToBytes(working);
 	}
@@ -185,6 +242,14 @@ public class ChaCha20 {
 		// words 13-15: nonce (12 bytes -> 3 little-endian words)
 		for( int i = 0 ; i<3; i++) {
 			state[13 + i] = littleEndianWord(nonce, i * 4);
+		}
+
+		if (verbose) {
+			System.out.println("\n buildInitialState: 4x4 word matrix  (counter = " + counter + ")\n");
+			System.out.println(" Row 0 [sigma constants ]  " + hexWord(state[0])  + "  " + hexWord(state[1])  + "  " + hexWord(state[2])  + "  " + hexWord(state[3]));
+			System.out.println(" Row 1 [key words 0-3   ]  " + hexWord(state[4])  + "  " + hexWord(state[5])  + "  " + hexWord(state[6])  + "  " + hexWord(state[7]));
+			System.out.println(" Row 2 [key words 4-7   ]  " + hexWord(state[8])  + "  " + hexWord(state[9])  + "  " + hexWord(state[10]) + "  " + hexWord(state[11]));
+			System.out.println(" Row 3 [counter + nonce ]  " + hexWord(state[12]) + "  " + hexWord(state[13]) + "  " + hexWord(state[14]) + "  " + hexWord(state[15]));
 		}
 
 		return state;
