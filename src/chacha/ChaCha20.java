@@ -4,6 +4,8 @@ import java.security.SecureRandom;
 
 public class ChaCha20 {
 
+	public static boolean verbose = false;
+
 	/***********************************************/
 	/********************* API *********************/
 	/***********************************************/
@@ -324,4 +326,32 @@ public class ChaCha20 {
 		return bytes;
 	}
 
+
+	/*****************************************************/
+	/*************** VERBOSE HELPERS *********************/
+	/*****************************************************/
+
+	private static String hexWord(int word) {
+		return String.format("%08x", word);
+	}
+
+	private static void printStateGrid(int[] state) {
+		for (int row = 0; row < 4; row++) {
+			System.out.print("    ");
+			for (int col = 0; col < 4; col++) {
+				System.out.print(hexWord(state[row * 4 + col]));
+				if (col < 3) System.out.print("  ");
+			} System.out.println();
+		} System.out.println();
+	}
+
+	private static void printBytes(byte[] data, int count, int cols) {
+		for (int i = 0; i < count; i++) {
+			if (i % cols == 0) System.out.print("    ");
+			System.out.printf("%02x", data[i] & 0xFF);
+			System.out.print((i % cols == cols - 1 || i == count - 1) ? "\n" : " ");
+		}
+	}
+
+	
 }

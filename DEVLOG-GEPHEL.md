@@ -1,5 +1,12 @@
 # Devlog - Gephel Kogyal
 
+## 2026-05-24
+* implemented verbose option in chacha20
+* implemented printing word, stategrid, bytes list in chacha20
+* added verbosechacha20 for testing the verbose option
+
+## 2026-05-23 (sick)
+
 ## 2026-05-22
 * added generalized prompting for vault using Predicate
 * added encrypt/decrypting stored ciphersting
