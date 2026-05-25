@@ -3,45 +3,52 @@ package testing;
 import aes.AES256;
 import aes.AESKeySchedule;
 
-/*
-COMMANDS
-javac -cp src src/aes/*.java testing/*.java
-java -cp "src:." testing.TestAES256
-*/
-  
-public class TestAES256 {
+import javax.crypto.Cipher;
+import javax.crypto.spec.SecretKeySpec;
+import java.util.Arrays;
 
-    public static void main(String[] args) {
-        AES256 aes = new AES256();
-        String text = "StuyvesantHS2026";
+public class TestAES256 extends TestSuite {
 
-        byte[] plainText = text.getBytes();
+	public static void main(String[] args) {
+		new TestAES256().executeSuite("AES-256");
+	}
 
-        String key = "supersecretpasswordforvault12345";
-        byte[] masterKey = key.getBytes();
+	@Override
+	protected void runTest(String plaintext, int N) {
 
-        System.out.println("Original: " + text);
+		byte[] key = new byte[32];
+		TestUtils.RNG.nextBytes(key);
 
-        int[] expanded = AESKeySchedule.expandKey(masterKey);
+		byte[] ptBytes = plaintext.getBytes(java.nio.charset.StandardCharsets.UTF_8);
+		String label = TestUtils.preview(plaintext);
 
-        byte[] cipher = aes.encrypt(plainText, expanded);
+		AES256 aes = new AES256();
+		int[] eKey = AESKeySchedule.expandKey(key);
 
-        System.out.print("Encrypted: ");
-        for (byte b : cipher) {
-            String hex = Integer.toHexString(0xff & b);
-            if (hex.length() == 1) System.out.print('0');
-            System.out.print(hex + " ");
-        }
-        System.out.println();
+		byte[] myAES = aes.encrypt(ptBytes, eKey);
+		byte[] javaAES = javaEncrypt(ptBytes, key);
 
-        byte[] decrypted = aes.decrypt(cipher, expanded);
-        String result = new String(decrypted);
-        System.out.println("Decrypted: " + result);
+		if (javaAES != null) {
+			printResult(label + " [ciphertext vs javax.crypto]", Arrays.equals(javaAES, myAES), TestUtils.toHex(javaAES), TestUtils.toHex(myAES), N);
+		} else {
+			System.out.printf(" [SKIP] %s — javax.crypto unavailable%n", label);
+		}
 
-        if (text.equals(result)) {
-            System.out.println("Status: works");
-        } else {
-            System.out.println("Status: broken");
-        }
-    }
+
+		byte[] recovered = aes.decrypt(myAES, eKey);
+		printResult(label + " [round-trip decrypt]", Arrays.equals(ptBytes, recovered), plaintext, new String(recovered, java.nio.charset.StandardCharsets.UTF_8), N + 1);
+	}
+
+
+	private static byte[] javaEncrypt(byte[] pt, byte[] key) {
+		try {
+			SecretKeySpec ks = new SecretKeySpec(key, "AES");
+			Cipher c = Cipher.getInstance("AES/ECB/PKCS5Padding");
+			c.init(Cipher.ENCRYPT_MODE, ks);
+			return c.doFinal(pt);
+		} catch (Exception e) {
+			System.out.println(" [ERROR] javax.crypto: " + e.getMessage());
+			return null;
+		}
+	}
 }
