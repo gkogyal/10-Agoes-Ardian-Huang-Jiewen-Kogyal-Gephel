@@ -1,60 +1,97 @@
 package vault;
+
 import sha.SHA256;
 import aes.AES256;
 import chacha.ChaCha20;
+
+import java.nio.charset.StandardCharsets;
 
 import java.util.Scanner;
 import java.util.ArrayList;
 import java.util.HexFormat;
 import java.util.function.Predicate;
-import java.util.Set
+import java.util.Set;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
+import java.sql.*;
+
 
 
 public class Vault {
 
-    private static String masterPasswordHash;
-	private static byte[] derivedKey;
+	private static final String DB_FILE = "vault.db";
 
-    private static ArrayList<VaultEntry> database = new ArrayList<>();
+	private static final DateTimeFormatter TS = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+	
+	private static byte[] derivedKey;
+	private static int[] aesKey;
+
+	private static Connection db;
+
     private static Scanner scanner = new Scanner(System.in);
 
-    private static final Set<String> COMMANDS = Set.of("add", "list", "get", "del", "help", "quit");
+    private static final Set<String> CMDS = Set.of("add", "list", "get", "del", "help", "quit");
 
     public static void main(String[] args) {
-        System.out.println("-- CIPHER VAULT --");
-        
-        System.out.print("\nSet master password: ");
-        String master = scanner.nextLine();
-        
-        System.out.print("Confirm master password: ");
-		String confirm = scanner.nextLine();
-        
-        if (!sha256Hex(master).equals(sha256Hex(confirm))) {
-            System.out.println("Passwords don't match. Exiting.");
-            return;
-        }
 
-        masterPasswordHash = sha256Hex(master);
+		
+		try {
 
-        derivedKey = ChaCha20.fromHex(masterPasswordHash);
-        
-        System.out.println("\nVault unlocked.\nType 'help' for commands.\n");
-        loop();
+			System.out.println("=".repeat(30));
+			System.out.println("       Cipher Vault");
+			System.out.println("=".repeat(30));
+
+			if (!masterHashExists()) {
+				setupNewVault();
+			} else {
+				authenticateExisting();
+			}
+
+			
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+		}
     }
 
-	private static String prompt(String label, Predicate<String> validator, String errorMsg) {
-		while (true) {
-			System.out.print(label);
-			String input = scanner.nextLine().trim();
-			if (validator.test(input)) return input;
-			System.out.println(errorMsg);
+	private static void setupNewVault() {
+		System.out.println("\n[New vault — choose a master password]");
+		String master = prompt("  Set master password (≥8 chars): ", s -> s.length() >= 8, "  Password must be at least 8 characters.");
+		String confirm = prompt("  Confirm password: ", s -> true, "");
+		if (!master.equals(confirm)) {
+			System.out.println("Passwords don't match. Exiting.");
+			System.exit(1);
 		}
+
+		String hash = sha256Hex(master);
+		saveMasterHash(hash); //wip
+		unlockKey(hash);
+	}
+
+
+	private static void authenticateExisting() {
+		System.out.print("\nMaster password: ");
+		String input = scanner.nextLine();
+		String hash = sha256Hex(input);
+		if (!hash.equals(loadMasterHash())) {
+			System.out.println("Incorrect password.");
+			System.exit(1);
+		}
+		unlockKey(hash);
+	}
+
+	// getting encryption key from master pwd hash
+	private static void unlockKey(String hash) { 
+		derivedKey = ChaCha20.fromHex(hash);
+		aesKey = AESKeySchedule.expandKey(derivedKey);
+		
 	}
 
 
     private static void loop() {
         while (true) {        
-            String cmd = prompt("> ", c -> COMMANDS.contains(c.toLowerCase()),"Unknown command. Type 'help'.")
+            String cmd = prompt("> ", c -> COMMANDS.contains(c.toLowerCase()),"Unknown command. Type 'help'.");
 
             
 			switch(cmd.toLowerCase()) {
@@ -74,6 +111,10 @@ public class Vault {
 			}
         }
     }
+
+	/***********************************************/
+	/******************** CMDS *********************/
+	/***********************************************/
 
     private static void printHelp() {
         System.out.println("\n ** List of Commands **");
@@ -133,7 +174,11 @@ public class Vault {
 		System.out.println();
 	}
 
+	private static void delEntry() {}
 
+	/***********************************************/
+	/******************* HELPER ********************/
+	/***********************************************/
 
     private static String encryptChaCha20(String plaintext) {
         byte[] ciphertext = ChaCha20.encrypt(plaintext.getBytes(), derivedKey);
@@ -141,16 +186,66 @@ public class Vault {
     }
     private static String decryptChaCha20(String hex) {
         byte[] ciphertext = ChaCha20.fromHex(hex);
-        byte[] plaintext  = ChaCha20.decrypt(ciphertext, derivedKey);
+        byte[] plaintext = ChaCha20.decrypt(ciphertext, derivedKey);
         return new String(plaintext);
     }
 
-    private static String decrypt(String stored) {
-        if (stored.startsWith("AES:"))  return decryptAES(stored.substring(4));
-        if (stored.startsWith("CC20:")) return decryptChaCha20(stored.substring(5));
-        throw new IllegalArgumentException("Unrecognised cipher prefix in stored entry");
+    private static String encryptAES(String plaintext) {
+    	AES256 aes = new AES256();
+    	byte[] ct  = aes.encrypt(plaintext.getBytes(StandardCharsets.UTF_8), aesKey);
+    	return toHex(ct);
     }
 
+    private static String decryptAES(String hex) {
+    	AES256 aes = new AES256();
+		byte[] ciphertext = fromHex(hex);
+		byte[] plaintext = aes.decrypt(ct, aesKey);
+		return new String(plaintext, StandardCharsets.UTF_8);
+    }
 
-    
+    private static String decrypt(VaultEntry entry) {
+		switch(	entry.ciphertype) {
+			case "AES": return decryptAES(entry.ciphertext);
+			case "CC20": return decryptChaCha20(entry.ciphertext);
+			default: throw new IllegalArgumentException("Unknown cipher type: " + e.ciphertype);
+		}
+    }
+
+	/***********************************************/
+	/********************** DB *********************/
+	/***********************************************/
+
+
+   	/***********************************************/
+	/****************** UTILITIES ******************/
+	/***********************************************/
+
+	private static String sha256Hex(String input) {
+		byte[] hash = SHA256.hash(input.getBytes(StandardCharsets.UTF_8));
+		return toHex(hash);
+	}
+
+	private static String toHex(byte[] bytes) {
+		StringBuilder sb = new StringBuilder();
+		for (byte b : bytes) sb.append(String.format("%02x", b & 0xFF));
+		return sb.toString();
+	}
+
+
+	private static byte[] fromHex(String hex) {
+		byte[] bytes = new byte[hex.length() / 2];
+		for (int i = 0; i < bytes.length; i++) bytes[i] = (byte) Integer.parseInt(hex.substring(i * 2, i * 2 + 2), 16);
+		return bytes;
+	}
+
+
+	private static String prompt(String label, Predicate<String> validator, String errorMsg) {
+		while (true) {
+			System.out.print(label);
+			String input = scanner.nextLine().trim();
+			if (validator.test(input)) return input;
+			System.out.println(errorMsg);
+		}
+	}
+	
 }
