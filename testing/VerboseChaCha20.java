@@ -13,7 +13,7 @@ public class VerboseChaCha20 {
 		
 		Scanner sc = new Scanner(System.in);
 
-		section("ChaCha20 Verbose Testing");
+		TestUtils.section("ChaCha20 Verbose Testing");
 
 		System.out.print("  Enter plaintext: ");
 		String plaintext = sc.nextLine();
@@ -34,7 +34,7 @@ public class VerboseChaCha20 {
 		// 3. print the setup
 
 
-		section("Value Preview Summary");
+		TestUtils.section("Value Preview Summary");
 
 		
 		System.out.println("   Plaintext    | \"" + plaintext + "\"");
@@ -47,7 +47,7 @@ public class VerboseChaCha20 {
 
 		// 4. encrypt trace
 
-		section("Encryption Trace");
+		TestUtils.section("Encryption Trace");
 
 		ChaCha20.verbose = true;
 
@@ -57,14 +57,14 @@ public class VerboseChaCha20 {
 
 		System.out.println();
 
-		section("Encryption Result");
+		TestUtils.section("Encryption Result");
 
 		System.out.println("  Ciphertext (hex): " + ChaCha20.toHex(ciphertext));
 
 
 		// 5. decrypt trace
 
-		section("Decryption Trace");
+		TestUtils.section("Decryption Trace");
 
 		ChaCha20.verbose = true;
 
@@ -75,7 +75,7 @@ public class VerboseChaCha20 {
 		// 6. final result
 
 
-		section("Final Result");
+		TestUtils.section("Final Result");
 
 		String recoveredStr = new String(recovered, java.nio.charset.StandardCharsets.UTF_8);
 		boolean recoveredQ = plaintext.equals(recoveredStr);
@@ -94,29 +94,5 @@ public class VerboseChaCha20 {
 
 		 System.out.println();
 	}
-
-
-
-	private static String line(int N) {
-		return "=".repeat(N);
-	}
-
-	private static void section(String a, String b, String c) {
-		System.out.print(a + b + c);
-	}
-
-	private static void section(String str, int N) {
-		N = Math.max(N,str.length()+10);
-
-		String div = line(N) + "\n";
-		String mid = " ".repeat((N - str.length())/2);
-
-		System.out.print(div + mid + str + "\n" + div + "\n");
-	}
-
-	private static void section(String str) {
-		section(str,Math.max(30,str.length()+10));
-	}
-
 
 }

@@ -7,6 +7,9 @@
 * added printing xorTable option
 * added TestUtils files to reduce function repeating
 * unified 3 Test files under TestSuite
+* templated verbose suites for aes/sha
+* made all in one test suite, Test.java
+* made makefile for ease of access
 
 ## 2026-05-23 (sick)
 
