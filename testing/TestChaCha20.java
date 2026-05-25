@@ -19,14 +19,14 @@ public class TestChaCha20 {
 
 	public static void main(String[] args) {
 
-		section("ChaCha20 Test Suite");
+		TestUtils.section("ChaCha20 Test Suite");
 		//section(line(30),"     ChaCha20 Test Suite",line(30) + "\n");
 
 		String[] staticCases = staticCases();
 		String[] randomCases = randomCases();
 		String[] customCases = customCases();
 
-		section("STATIC TESTS (" + staticCases.length + " cases)");
+		TestUtils.section("STATIC TESTS (" + staticCases.length + " cases)");
 		// for (String str: staticCases) runTest(str);
 		for (int i  = 0; i<staticCases.length; i++) {
 			runTest(staticCases[i],2*i);
@@ -34,7 +34,7 @@ public class TestChaCha20 {
 
 		System.out.print("\n");
 
-		section("RANDOM TESTS (" + randomCases.length + " cases)");
+		TestUtils.section("RANDOM TESTS (" + randomCases.length + " cases)");
 		//for (String str: randomCases) runTest(str);
 		for (int i  = 0; i<randomCases.length; i++) {
 			runTest(randomCases[i],2*i);
@@ -42,7 +42,7 @@ public class TestChaCha20 {
 		
 		System.out.print("\n");
 		
-		section("CUSTOM TESTS (" + customCases.length + " cases)");
+		TestUtils.section("CUSTOM TESTS (" + customCases.length + " cases)");
 		//for (String str: customCases) runTest(str);
 		for (int i  = 0; i<customCases.length; i++) {
 			runTest(customCases[i],2*i);
@@ -50,7 +50,7 @@ public class TestChaCha20 {
 
 		System.out.print("\n");
 		
-		section("Passed: " + passed  + "   Failed " + failed);
+		TestUtils.section("Passed: " + passed  + "   Failed " + failed);
     }
 
 
@@ -127,7 +127,7 @@ public class TestChaCha20 {
 
 		byte[] plaintextBytes = plaintext.getBytes(java.nio.charset.StandardCharsets.UTF_8);
 
-		String label = preview(plaintext);
+		String label = TestUtils.preview(plaintext);
 
 		// javax.crypto used for chacha20
 		byte[] jaCha = javaEncrypt(plaintextBytes, key, nonce);
@@ -170,42 +170,10 @@ public class TestChaCha20 {
 		}
 		else {
 			System.out.printf(nu + ": [FAIL] %s%n", label);
-			System.out.printf("	  exp: %s%n", truncate(exp, 80));
-			System.out.printf("	  got: %s%n", truncate(got, 80));
+			System.out.printf("	  exp: %s%n", TestUtils.truncate(exp, 80));
+			System.out.printf("	  got: %s%n", TestUtils.truncate(got, 80));
 			failed++;
 		}
-	}
-
-	private static String line(int N) {
-		return "=".repeat(N);
-	}
-
-	private static void section(String a, String b, String c) {
-		System.out.print(a + b + c);
-	}
-
-	private static void section(String str, int N) {
-		N = Math.max(N,str.length()+10);
-
-		String div = line(N) + "\n";
-		String mid = " ".repeat((N - str.length())/2);
-
-		System.out.print(div + mid + str + "\n" + div + "\n");
-	}
-
-	private static void section(String str) {
-		section(str,Math.max(30,str.length()+10));
-	}
-
-	private static String preview(String s) {
-		if (s.isEmpty()) return "<empty>";
-
-		String clean = s.replaceAll("[\\r\\n\\t]", " ");
-		return clean.length() <= 30 ? "\"" + clean + "\"" : "\"" + clean.substring(0, 27) + "...\"";
-	}
-
-	private static String truncate(String s, int max) {
-		return s.length() <= max ? s : s.substring(0, max) + "…" + " ( " + (max-s.length()) + "more)";
 	}
 
 }

@@ -97,9 +97,9 @@ public class Vault {
 
 
 		String stored = choice.equals("2") ? "AES:" + encryptAES(password) : "CC20:" + encryptChaCha20(password);
-		String cipherLabel = choices.equals("2") ? "AES-256" : "ChaCha20";
+		String cipherLabel = choice.equals("2") ? "AES-256" : "ChaCha20";
 
-        database.add(new VaultEntry(site, username, password));
+        database.add(new VaultEntry(site, username, stored));
         System.out.println("Stored with " + cipherLabel + ".");
     }
 

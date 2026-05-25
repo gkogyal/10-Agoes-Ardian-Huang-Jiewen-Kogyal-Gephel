@@ -14,26 +14,26 @@ public class TestSHA256 {
     private static final Scanner SCANNER = new Scanner(System.in);
 
     public static void main(String[] args) {
-        section("SHA-256 Test Suite");
+        TestUtils.section("SHA-256 Test Suite");
         String[] staticCases = staticCases();
         String[] randomCases = randomCases();
         String[] customCases = customCases();
-		section("STATIC TESTS (" + staticCases.length + " cases)");
+		TestUtils.section("STATIC TESTS (" + staticCases.length + " cases)");
 		for (int i  = 0; i<staticCases.length; i++) {
 			runTest(staticCases[i],2*i);
 		}
 		System.out.print("\n");
-		section("RANDOM TESTS (" + randomCases.length + " cases)");
+		TestUtils.section("RANDOM TESTS (" + randomCases.length + " cases)");
 		for (int i  = 0; i<randomCases.length; i++) {
 			runTest(randomCases[i],2*i);
 		}
 		System.out.print("\n");
-		section("CUSTOM TESTS (" + customCases.length + " cases)");
+		TestUtils.section("CUSTOM TESTS (" + customCases.length + " cases)");
 		for (int i  = 0; i<customCases.length; i++) {
 			runTest(customCases[i],2*i);
 		}
 		System.out.print("\n");
-		section("Passed: " + passed  + "   Failed " + failed);
+		TestUtils.section("Passed: " + passed  + "   Failed " + failed);
     }
 
     private static String[] staticCases() {
@@ -103,7 +103,7 @@ public class TestSHA256 {
 	private static void runTest(String input, int N) {
 		byte[] inputBytes = input.getBytes(java.nio.charset.StandardCharsets.UTF_8);
 
-		String label = preview(input);
+		String label = TestUtils.preview(input);
 
 		// MessageDigest used for sha-256 reference
 		byte[] javaSha = javaHash(inputBytes);
@@ -142,37 +142,5 @@ public class TestSHA256 {
 			failed++;
 		}
 	}
-
-	private static String line(int N) {
-		return "=".repeat(N);
-	}
-
-	private static void section(String a, String b, String c) {
-		System.out.print(a + b + c);
-	}
-
-	private static void section(String str, int N) {
-		N = Math.max(N,str.length()+10);
-
-		String div = line(N) + "\n";
-		String mid = " ".repeat((N - str.length())/2);
-
-		System.out.print(div + mid + str + "\n" + div + "\n");
-	}
-
-	private static void section(String str) {
-		section(str,Math.max(30,str.length()+10));
-	}
-
-	private static String preview(String s) {
-		if (s.isEmpty()) return "<empty>";
-
-		String clean = s.replaceAll("[\\r\\n\\t]", " ");
-		return clean.length() <= 30 ? "\"" + clean + "\"" : "\"" + clean.substring(0, 27) + "...\"";
-	}
-
-	private static String truncate(String s, int max) {
-		return s.length() <= max ? s : s.substring(0, max) + "…" + " ( " + (max-s.length()) + "more)";
-	}
-
+	
 }
