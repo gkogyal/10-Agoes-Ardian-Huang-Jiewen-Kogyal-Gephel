@@ -12,9 +12,6 @@ import java.util.HexFormat;
 import java.util.function.Predicate;
 import java.util.Set;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-
 import java.sql.*;
 
 
@@ -22,8 +19,6 @@ import java.sql.*;
 public class Vault {
 
 	private static final String DB_FILE = "vault.db";
-
-	private static final DateTimeFormatter TS = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 	
 	private static byte[] derivedKey;
 	private static int[] aesKey;
@@ -36,7 +31,6 @@ public class Vault {
 
     public static void main(String[] args) {
 
-		
 		try {
 
 			System.out.println("=".repeat(30));
@@ -57,7 +51,7 @@ public class Vault {
 
 	private static void setupNewVault() {
 		System.out.println("\n[New vault — choose a master password]");
-		String master = prompt("  Set master password (≥8 chars): ", s -> s.length() >= 8, "  Password must be at least 8 characters.");
+		String master = prompt("  Set master password (>= 12 chars): ", s -> s.length() >= 12, "  Password must be at least 12 characters.");
 		String confirm = prompt("  Confirm password: ", s -> true, "");
 		if (!master.equals(confirm)) {
 			System.out.println("Passwords don't match. Exiting.");
@@ -91,8 +85,7 @@ public class Vault {
 
     private static void loop() {
         while (true) {        
-            String cmd = prompt("> ", c -> COMMANDS.contains(c.toLowerCase()),"Unknown command. Type 'help'.");
-
+            String cmd = prompt("> ", c -> CMDS.contains(c.toLowerCase()),"Unknown command. Type 'help'.");
             
 			switch(cmd.toLowerCase()) {
 
@@ -127,9 +120,14 @@ public class Vault {
 
     private static void addEntry() {
     
-		System.out.print("site: ");
-		String site = scanner.nextLine().trim();
-        
+		String site = prompt(" site:  ", s->!s.equals(""), "Site can not be empty.");
+
+		if(findEntry(site) != null) {
+			System.out.println(" Entry for ' " +site+ "' already exists. Use 'del' first."); return;
+		} else {
+			
+		}
+
 		String username = prompt(" USERNAME: ", u -> u.length()>=3 && u.matches("[a-ZA-Z_]+"), "Username must be at least 3 characters and contain only letters or underscores.");
 
 		String password = prompt(" PASSWORD: ", p -> p.length()>=12, "Password must have at least 12 characters");
@@ -138,43 +136,61 @@ public class Vault {
 
 
 		String stored = choice.equals("2") ? "AES:" + encryptAES(password) : "CC20:" + encryptChaCha20(password);
-		String cipherLabel = choice.equals("2") ? "AES-256" : "ChaCha20";
+		String ciphertype = choice.equals("2") ? "AES" : "CC20";
+		String ciphertext = choice.equals("2") ? encryptAES(password) : encryptChaCha20(password);
 
-        database.add(new VaultEntry(site, username, stored));
-        System.out.println("Stored with " + cipherLabel + ".");
+
+		VaultEntry entry = new VaultEntry(site, username, ciphertext, ciphertype);
+
+        System.out.println("Successfully stored with " + ciphertype + ".");
     }
 
     private static void listEntries() {
-        if (database.isEmpty()) {
-            System.out.println("vault is empty.");
-            return;
-        }
+    	ArrayList<VaultEntry> entries = loadAllEntries();
+        if (entries.isEmpty()) {System.out.println("  Vault is empty."); return;}
+
+        
+		System.out.printf("  %-24s  %-20s  %-6s%n",e.site, e.username, e.ciphertype);
+		
+        for (VaultEntry e : entries) {
+			System.out.printf("  %-4d  %-24s  %-20s  %-6s  %s%n", e.site, e.username, e.ciphertype);
+		}
+        
         for (int i = 0; i < database.size(); i++) {
             System.out.println("  " + (i + 1) + ". " + database.get(i).site);
         }
     }
 
 	private static void getEntry() {
-		if (database.isEmpty()) { System.out.println("  Vault is empty."); return; }
+		ArrayList<VaultEntry> entries = loadAllEntries();
+		if (entries.isEmpty()) { System.out.println("  Vault is empty."); return; }
 
-		System.out.print("  site: ");
-		String site = scanner.nextLine().trim();
+		String site = prompt(" site:  ", s->!s.equals(""), "Site can not be empty.");
 
 		VaultEntry entry = findEntry(site);
-		if (entry == null) {
-			System.out.println("No entry found for: " + site);
-			return;
-		}
+		if (entry == null) { System.out.println("  No entry found."); return; }
 
-		String decrypted = decrypt(entry.encryptedPasswd);
+		String decrypted = decrypt(entry);
+
 		System.out.println();
-		System.out.println("Site: " + entry.site);
-		System.out.println("Username: " + entry.username);
-		System.out.println("Password: " + decrypted);
+		System.out.println("  Site     : " + entry.site);
+		System.out.println("  Username : " + entry.username);
+		System.out.println("  Password : " + decrypted);
+		System.out.println("  Cipher   : " + entry.ciphertype);
 		System.out.println();
+
 	}
 
-	private static void delEntry() {}
+	private static void delEntry() {
+		String site = prompt(" site:  ", s->!s.equals(""), "Site can not be empty.");
+
+		VaultEntry entry = findEntry(site);
+		if (entry == null) { System.out.println("  No entry found."); return; }
+
+		deleteEntry(site);
+		System.out.println(" Deleted entry.\n");
+		
+	}
 
 	/***********************************************/
 	/******************* HELPER ********************/
@@ -215,6 +231,21 @@ public class Vault {
 	/********************** DB *********************/
 	/***********************************************/
 
+	private static void initializeVault() {}
+
+	private static boolean masterHashExists() {}
+
+	private static void saveMasterHash(String hash) {}
+
+	private static String loadMasterHash() {}
+
+	private static int countEntries() {}
+
+	private static VaultEntry findEntry(String site) {}
+
+	private static ArrayList<VaultEntry> loadAllEntries() {}
+
+	private static void insertEntry(VaultEntry e) {}
 
    	/***********************************************/
 	/****************** UTILITIES ******************/

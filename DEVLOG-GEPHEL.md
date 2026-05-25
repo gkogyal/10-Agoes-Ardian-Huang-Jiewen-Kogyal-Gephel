@@ -1,6 +1,7 @@
 # Devlog - Gephel Kogyal
 
 ## 2026-05-25
+* added vault functions for Vault.java
 * updated Vault.java to use SQL
 
 ## 2026-05-24
