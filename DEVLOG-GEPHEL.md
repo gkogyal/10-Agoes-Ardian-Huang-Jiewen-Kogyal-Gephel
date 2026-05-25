@@ -1,5 +1,8 @@
 # Devlog - Gephel Kogyal
 
+## 2026-05-25
+* updated Vault.java to use SQL
+
 ## 2026-05-24
 * implemented verbose option in chacha20
 * implemented printing word, stategrid, bytes list in chacha20
