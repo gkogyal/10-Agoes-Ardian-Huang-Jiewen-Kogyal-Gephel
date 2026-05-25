@@ -115,7 +115,7 @@ public class Vault {
 
 	private static void getEntry() {
 		if (database.isEmpty()) { System.out.println("  Vault is empty."); return; }
- 
+
 		System.out.print("  site: ");
 		String site = scanner.nextLine().trim();
 
@@ -124,7 +124,7 @@ public class Vault {
 			System.out.println("No entry found for: " + site);
 			return;
 		}
- 
+
 		String decrypted = decrypt(entry.encryptedPasswd);
 		System.out.println();
 		System.out.println("Site: " + entry.site);
@@ -152,5 +152,5 @@ public class Vault {
     }
 
 
-    
+
 }
