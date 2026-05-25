@@ -6,6 +6,7 @@
 * added verbosechacha20 for testing the verbose option
 * added printing xorTable option
 * added TestUtils files to reduce function repeating
+* unified 3 Test files under TestSuite
 
 ## 2026-05-23 (sick)
 
