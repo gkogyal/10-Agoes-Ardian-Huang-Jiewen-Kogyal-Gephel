@@ -2,6 +2,7 @@ package testing;
 
 import aes.AES256;
 import aes.AESKeySchedule;
+import aes.AESCipher;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
@@ -22,10 +23,10 @@ public class TestAES256 extends TestSuite {
 		byte[] ptBytes = plaintext.getBytes(java.nio.charset.StandardCharsets.UTF_8);
 		String label = TestUtils.preview(plaintext);
 
-		AES256 aes = new AES256();
+		AESCipher aesCipher = new AESCipher();
 		int[] eKey = AESKeySchedule.expandKey(key);
 
-		byte[] myAES = aes.encrypt(ptBytes, eKey);
+		byte[] myAES = aesCipher.encrypt(ptBytes, eKey);
 		byte[] javaAES = javaEncrypt(ptBytes, key);
 
 		if (javaAES != null) {
@@ -35,7 +36,7 @@ public class TestAES256 extends TestSuite {
 		}
 
 
-		byte[] recovered = aes.decrypt(myAES, eKey);
+		byte[] recovered = aesCipher.decrypt(myAES, eKey);
 		printResult(label + " [round-trip decrypt]", Arrays.equals(ptBytes, recovered), plaintext, new String(recovered, java.nio.charset.StandardCharsets.UTF_8), N + 1);
 	}
 

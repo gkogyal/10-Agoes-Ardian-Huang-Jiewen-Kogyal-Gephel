@@ -1,5 +1,9 @@
 # Devlog - Gephel Kogyal
 
+## 2026-05-25
+* added vault functions for Vault.java
+* updated Vault.java to use SQL
+
 ## 2026-05-24
 * implemented verbose option in chacha20
 * implemented printing word, stategrid, bytes list in chacha20
@@ -7,6 +11,9 @@
 * added printing xorTable option
 * added TestUtils files to reduce function repeating
 * unified 3 Test files under TestSuite
+* templated verbose suites for aes/sha
+* made all in one test suite, Test.java
+* made makefile for ease of access
 
 ## 2026-05-23 (sick)
 
