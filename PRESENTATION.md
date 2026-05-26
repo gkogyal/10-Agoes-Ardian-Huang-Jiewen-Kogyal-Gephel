@@ -126,3 +126,14 @@ The compression function only handles 64-byte things, but since most messages ob
 3. Append the original bit-length as 8 bytes.
 
 The result is always a multiple of 64 bytes.
+
+---
+
+## 6. Message Schedule (FIPS 6.2.2)
+
+For each 64-byte block, we build a `W[]`, which is always 64 × 32-bit words for the compression rounds.
+
+- **W[0..15]**: read directly from the block as 16 big-endian 32-bit integers.
+- **W[16..63]** is extended via `W[i] = σ₁(W[i-2]) + W[i-7] + σ₀(W[i-15]) + W[i-16]`.
+
+Essentially, we can turn 16 words into 64 words using the small sigma functions to basically mix in earlier words into later words, which allows us to scramble the letters better such that one letter change will change the entire resultant hash.
