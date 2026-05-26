@@ -11,7 +11,6 @@ Each algorithm is built from basic mathematical/bitwise operators and has a live
 - Ardian — AES-256
 - Jiewen — SHA-256 
 - Gephel - ChaCha20
-- everyone - Docker vulnerability demo with CTF challenge, visualization, and CLI application layer.
 
 | Component | Primary | Secondary |
 |---|---|---|
