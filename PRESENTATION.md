@@ -186,11 +186,17 @@ This appears very often in cryptography. MD5 is one such example.
 From [FIPS 180-4 4.1.2](https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.180-4.pdf) (pp. 10–11):
 
 > SHA-224 and SHA-256 use six logical functions, where each function operates on 32-bit words, which are represented as x, y, and z. The result of each function is a new 32-bit word.
+
 > Ch(x, y, z) = (x ∧ y) ⊕ (¬x ∧ z)
+
 > Maj(x, y, z) = (x ∧ y) ⊕ (x ∧ z) ⊕ (y ∧ z)
+
 > Σ₀{256}(x) = ROTR^2(x) ⊕ ROTR^13(x) ⊕ ROTR^22(x)
+
 > Σ₁{256}(x) = ROTR^6(x) ⊕ ROTR^11(x) ⊕ ROTR^25(x)
+
 > σ₀{256}(x) = ROTR^7(x) ⊕ ROTR^18(x) ⊕ SHR^3(x)
+
 > σ₁{256}(x) = ROTR^17(x) ⊕ ROTR^19(x) ⊕ SHR^10(x)
 
 Where `ROTR^n` is right-rotate by n bits and `SHR^n` is right-shift by n bits (both defined in 4.1.1 of the same pdf). The `{256}` part is arbitrary but basically it just differentiates it from SHA-512, which is similar but uses different rotation amounts.
@@ -215,6 +221,108 @@ Java has two right-shift operators.
 Java's [`>>>` operator](https://docs.oracle.com/javase/specs/jls/se17/html/jls-15.html#jls-15.19) is **unsigned right shift**. We use `>>>` everywhere we need a logical shift, because Java ints are signed. Without `>>>`, any value with the high bit set would break the calculations. This was the most common implementation bug I encountered in Java SHA-256. For instance, numbers in `K` like `0xbb67ae85` for ex. look like negative numbers to Java even though SHA-256 just thinks of them as a pattern that's 32 bits. So we need to use `>>>`.
 
 ---
+
+## 5. Padding (FIPS 5.1.1)
+
+The compression function only handles 64-byte things, but since most messages obviously aren't a clean multiple of 64, we have to pad the messages always to some multiple of 64.
+
+1. Append `0x80`.
+2. Add zeros until the length is `≡ 56 (mod 64)`.
+3. Append the original bit-length as 8 bytes.
+
+The result is always a multiple of 64 bytes.
+
+---
+
+## 6. Message Schedule (FIPS 6.2.2)
+
+For each 64-byte block, we build a `W[]`, which is always 64 × 32-bit words for the compression rounds.
+
+- **W[0..15]**: read directly from the block as 16 big-endian 32-bit integers.
+- **W[16..63]** is extended via `W[i] = σ₁(W[i-2]) + W[i-7] + σ₀(W[i-15]) + W[i-16]`.
+
+Essentially, we can turn 16 words into 64 words using the small sigma functions to basically mix in earlier words into later words, which allows us to scramble the letters better such that one letter change will change the entire resultant hash.
+
+---
+
+## 7. The Compression Function
+
+The compression takes the current 8-word state plus one block's `W[]`, runs 64 rounds and adds the result back into the state. Put simply, we use compression to do the actual hashing part. Everything else was just a setup until now, but here we take the 8 word state and the blocks of message schedule and mixes everything together using our various functions and after many rounds (64 of them) it adds the result back into the state.
+
+Copy state into 8 variables `a-h`:
+```java
+int a = state[0], b = state[1], ..., h = state[7];
+```
+
+Each round computes the new `a` and `e` using all the different functions we have:
+```java
+nextA = h + bigSigma1(e) + ch(e,f,g) + K[i] + W[i] + bigSigma0(a) + maj(a,b,c)
+nextE = d + h + bigSigma1(e) + ch(e,f,g) + K[i] + W[i]
+```
+
+Then we shift all 8 working variables down by one position:
+```java
+h = g;  g = f;  f = e;  e = nextE;
+d = c;  c = b;  b = a;  a = nextA;
+```
+
+After 64 rounds, **add** the working variables back into state:
+```java
+state[0] += a;  state[1] += b;  ... state[7] += h;
+```
+
+The `+=` is important, the function is called "compress" and not something like "encrypt". The message builds up from each block to get our final hash
+
+---
+
+## 8. `hash(byte[]) -> byte[32]`
+
+Our hash function is what runs through everything, all our functions, and returns the final output.
+
+```java
+public static byte[] hash(byte[] input) {
+    byte[] padded = pad(input);
+    int[] state = new int[8];
+    System.arraycopy(Constants.H, 0, state, 0, 8);
+    for (int i = 0; i < padded.length; i += 64) {
+        int[] W = messageSchedule(padded, i);
+        compress(state, W);
+    }
+    byte[] output = new byte[32];
+    for (int i = 0; i < 8; i++) wordToBytes(state[i], output, i * 4);
+    return output;
+}
+```
+
+test: `SHA-256("abc")` produces
+```
+ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad
+```
+
+This matched what I got using Java's MessageDigest for sha-256.
+
+---
+
+## 10. Testing
+
+`testing/TestSHA256.java` has three categories:
+- **Static cases**: known inputs including the `"abc"` test and boundary tests at 55, 56, 64 bytes for edge cases.
+- **Random cases**: byte arrays 10–300 bytes that we picked at random using secureRandom
+- **Custom cases**: strings you can type in directly into the CLI
+
+Every case gets compared against Java's built-in `MessageDigest` as the reference. 
+
+```bash
+make test-sha
+```
+Most recent run states **15 / 15 PASS**, so our code must be working
+
+---
+
+## 11. Refs
+
+- [NIST FIPS 180-4 - Secure Hash Standard](https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.180-4.pdf) 4.1.2 (helpers), 4.2.2 (constants), 5.1.1 (padding), 6.2.2 (schedule + compression)
+- [Wikipedia - SHA-2](https://en.wikipedia.org/wiki/SHA-2)
 
 # ChaCha20 by Gephel
 
@@ -422,3 +530,5 @@ CREATE TABLE entries (
 - **Simple key derivation**: The masterpassword's SHA-256 is the key, but real vaults use a proper **KDF** like [PBKDF2](https://en.wikipedia.org/wiki/PBKDF2)
 - **Simple database**: No multiuser support, backups, or syncs
 - **Lack of salting**: Allows for effective rainbow lists
+
+---

@@ -75,3 +75,4 @@
 ## 2026-05-26
 
 * Filled in `testing/VerboseSHA256.java` modeled after Ardian's `VerboseAES256.java` so the verbose drivers stay consistent across all three algorithms
+* Completed `PRESENTATION.md`, explaining all facets of our code
