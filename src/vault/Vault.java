@@ -2,6 +2,7 @@ package vault;
 
 import sha.SHA256;
 import aes.AES256;
+import aes.AESCipher;
 import chacha.ChaCha20;
 
 import java.nio.charset.StandardCharsets;
@@ -207,15 +208,15 @@ public class Vault {
     }
 
     private static String encryptAES(String plaintext) {
-    	AES256 aes = new AES256();
+    	AESCipher aes = new AESCipher();
     	byte[] ct  = aes.encrypt(plaintext.getBytes(StandardCharsets.UTF_8), aesKey);
     	return toHex(ct);
     }
 
     private static String decryptAES(String hex) {
-    	AES256 aes = new AES256();
+    	AESCipher aes = new AESCipher();
 		byte[] ciphertext = fromHex(hex);
-		byte[] plaintext = aes.decrypt(ct, aesKey);
+		byte[] plaintext = aes.decrypt(ciphertext, aesKey);
 		return new String(plaintext, StandardCharsets.UTF_8);
     }
 
