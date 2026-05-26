@@ -2,25 +2,39 @@ package aes;
 
 public class AES256{
 
+  public static boolean verbose = false;
+
   /*
-  The encrypt() function is the main loop AES-256 encryption.
-  It takes a 16-byte plaintext block and the 60 word expanded key array and processes the data through 14 rounds.
-  It use an initial AddRoundKey step, runs 13 rounds of combined transformations (subBytes, shiftRows, mixColumns, addRoundKey)
-  It  finishes with a 14th round that omits the mixColumns step according to the NIST specification.
+   The encrypt() function is the main loop AES-256 encryption.
+   It takes a 16-byte plaintext block and the 60 word expanded key array and processes the data through 14 rounds.
+   It use an initial AddRoundKey step, runs 13 rounds of combined transformations (subBytes, shiftRows, mixColumns, addRoundKey)
+   It  finishes with a 14th round that omits the mixColumns step according to the NIST specification.
+   When verbose mode is enabled, it prints the state after each transformation for debugging purposes.
   */
 
   public byte[] encrypt(byte[] plaintext, int[] eKey){
     int[][] state = bytesToState(plaintext);
+    if (verbose) printState("Initial State", state);
     addRoundKey(state, getRoundKey(eKey, 0));
+    if (verbose) printState("After AddRoundKey(0)", state);
     for (int i = 1; i <= 13; i++){
+      if (verbose) System.out.println("Round " + i + ":");
       subBytes(state);
+      if (verbose) printState("After SubBytes(" + i + ")", state);
       shiftRows(state);
+      if (verbose) printState("After ShiftRows(" + i + ")", state);
       mixColumns(state);
+      if (verbose) printState("After MixColumns(" + i + ")", state);
       addRoundKey(state, getRoundKey(eKey, i));
+      if (verbose) printState("After AddRoundKey(" + i + ")", state);
     }
+    if (verbose) System.out.println("Round 14:");
     subBytes(state);
+    if (verbose) printState("After SubBytes(14)", state);
     shiftRows(state);
+    if (verbose) printState("After ShiftRows(14)", state);
     addRoundKey(state, getRoundKey(eKey, 14));
+    if (verbose) printState("After AddRoundKey(14)", state);
     return stateToBytes(state);
   }
 
@@ -28,20 +42,33 @@ public class AES256{
    The decrypt() function is the main loop for AES-256 decryption.
    It reverses the encryption process by running the inverse transformations in a backward sequence from Round 14 down to Round 0.
    It begins by XOR'ing the ciphertext with the final round key, then loops through the rounds applying inverse transformations
-   */
+   (inverseShiftRows, inverseSubBytes, addRoundKey, inverseMixColumns) in reverse order. The final round omits the inverseMixColumns step.
+   When verbose mode is enabled, it prints the state after each transformation for debugging purposes.
+  */
 
    public byte[] decrypt(byte[] ciphertext, int[] eKey){
      int[][] state = bytesToState(ciphertext);
+     if (verbose) printState("Initial State", state);
      addRoundKey(state, getRoundKey(eKey, 14));
+     if (verbose) printState("After AddRoundKey(14)", state);
      for (int i = 13; i >= 1; i--){
+       if (verbose) System.out.println("Round " + i + ":");
        inverseShiftRows(state);
+       if (verbose) printState("After InverseShiftRows(" + i + ")", state);
        inverseSubBytes(state);
+       if (verbose) printState("After InverseSubBytes(" + i + ")", state);
        addRoundKey(state, getRoundKey(eKey, i));
+       if (verbose) printState("After AddRoundKey(" + i + ")", state);
        inverseMixColumns(state);
+       if (verbose) printState("After InverseMixColumns(" + i + ")", state);
      }
+     if (verbose) System.out.println("Round 0:");
      inverseShiftRows(state);
+     if (verbose) printState("After InverseShiftRows(0)", state);
      inverseSubBytes(state);
+     if (verbose) printState("After InverseSubBytes(0)", state);
      addRoundKey(state, getRoundKey(eKey, 0));
+     if (verbose) printState("After AddRoundKey(0)", state);
      return stateToBytes(state);
    }
 
@@ -223,5 +250,17 @@ public class AES256{
       roundKey[3][i] = word & 0xFF;
     }
     return roundKey;
+  }
+
+  public void printState(String step, int[][] state){
+    System.out.println(step + ":");
+    for (int i = 0; i < 4; i++){
+      System.out.print("   ");
+      for (int j = 0; j < 4; j++){
+        System.out.printf("%02x ", state[i][j]);
+      }
+      System.out.println();
+    }
+    System.out.println();
   }
 }
