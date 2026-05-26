@@ -169,3 +169,31 @@ state[0] += a;  state[1] += b;  ... state[7] += h;
 The `+=` is important, the function is called "compress" and not something like "encrypt". The message builds up from each block to get our final hash
 
 ---
+
+## 8. `hash(byte[]) -> byte[32]`
+
+Our hash function is what runs through everything, all our functions, and returns the final output.
+
+```java
+public static byte[] hash(byte[] input) {
+    byte[] padded = pad(input);
+    int[] state = new int[8];
+    System.arraycopy(Constants.H, 0, state, 0, 8);
+    for (int i = 0; i < padded.length; i += 64) {
+        int[] W = messageSchedule(padded, i);
+        compress(state, W);
+    }
+    byte[] output = new byte[32];
+    for (int i = 0; i < 8; i++) wordToBytes(state[i], output, i * 4);
+    return output;
+}
+```
+
+test: `SHA-256("abc")` produces
+```
+ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad
+```
+
+This matched what I got using Java's MessageDigest for sha-256.
+
+---
