@@ -80,11 +80,17 @@ This appears very often in cryptography. MD5 is one such example.
 From [FIPS 180-4 4.1.2](https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.180-4.pdf) (pp. 10–11):
 
 > SHA-224 and SHA-256 use six logical functions, where each function operates on 32-bit words, which are represented as x, y, and z. The result of each function is a new 32-bit word.
+
 > Ch(x, y, z) = (x ∧ y) ⊕ (¬x ∧ z)
+
 > Maj(x, y, z) = (x ∧ y) ⊕ (x ∧ z) ⊕ (y ∧ z)
+
 > Σ₀{256}(x) = ROTR^2(x) ⊕ ROTR^13(x) ⊕ ROTR^22(x)
+
 > Σ₁{256}(x) = ROTR^6(x) ⊕ ROTR^11(x) ⊕ ROTR^25(x)
+
 > σ₀{256}(x) = ROTR^7(x) ⊕ ROTR^18(x) ⊕ SHR^3(x)
+
 > σ₁{256}(x) = ROTR^17(x) ⊕ ROTR^19(x) ⊕ SHR^10(x)
 
 Where `ROTR^n` is right-rotate by n bits and `SHR^n` is right-shift by n bits (both defined in 4.1.1 of the same pdf). The `{256}` part is arbitrary but basically it just differentiates it from SHA-512, which is similar but uses different rotation amounts.
@@ -107,3 +113,16 @@ Java has two right-shift operators.
 `>>` is arithmetic, and it fills the gap on the left when it shifts to the right with copies of the leftmost bit. If `x` is positive, zeros come in, but ones come in if it's negative. However, `>>>` fills the gap on the left with zeros no matter what. 
 
 Java's [`>>>` operator](https://docs.oracle.com/javase/specs/jls/se17/html/jls-15.html#jls-15.19) is **unsigned right shift**. We use `>>>` everywhere we need a logical shift, because Java ints are signed. Without `>>>`, any value with the high bit set would break the calculations. This was the most common implementation bug I encountered in Java SHA-256. For instance, numbers in `K` like `0xbb67ae85` for ex. look like negative numbers to Java even though SHA-256 just thinks of them as a pattern that's 32 bits. So we need to use `>>>`.
+
+
+---
+
+## 5. Padding (FIPS 5.1.1)
+
+The compression function only handles 64-byte things, but since most messages obviously aren't a clean multiple of 64, we have to pad the messages always to some multiple of 64.
+
+1. Append `0x80`.
+2. Add zeros until the length is `≡ 56 (mod 64)`.
+3. Append the original bit-length as 8 bytes.
+
+The result is always a multiple of 64 bytes.
