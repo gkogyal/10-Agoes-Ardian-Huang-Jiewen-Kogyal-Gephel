@@ -7,7 +7,7 @@ Built to demonstrate the inner workings of cryptographic primitives (well-establ
 2. AES-256: symmetric block encryption
 3. ChaCha20: modern stream cipher encryption.
 
-> See also: [PRESENTATION.md](PRESENTATION.md) | [PROPOSAL.md](PROPOSAL.md)
+> See also: [PRESENTATION.md](PRESENTATION.md) | [PROPOSAL.md](PROPOSAL.md) | [Project Presentation Video](https://drive.google.com/drive/folders/16FZypQeSJLzjdoputuXiRnXz1ExTttWC)
 
 ---
 
