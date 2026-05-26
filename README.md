@@ -45,14 +45,7 @@ Minimal, functional **credential vault** that stores site/username/password entr
    - SHA for master password
    - stored passwords encrypted with AES-256 or ChaCha20, using a key derived directly from the SHA-256 hash
 
-### 3. **Testing**: CTF security environment (Docker lab)
-Intentionally **vulnerable environment** as a container for an attack simulation.
-
- - Docker-based isolated lab environment using Digital Ocean droplets
- - deliberate misconfigurations or vulnerabilities for CTF-style exploitation exercises (specifics are WIP)
- - goal is to demonstrate real-world security failure scenarios
-
-### 4. **Visualization**: Terminal-based tracing
+### 3. **Visualization**: Terminal-based tracing
 **Debugging/educational mode** to show internals of AES, SHA-256, and ChaCha20 step-by-step
 
  - SHA-256 round-by-round state evolution
@@ -102,19 +95,16 @@ Intentionally **vulnerable environment** as a container for an attack simulation
 │       └── Constants.java		  # Sigma constants and utility values
 │
 ├── testing/
-│   ├── Test.java           	  # All-in-one test suite
-│   ├── TestSHA256.java           # SHA-256 test suite
-│   ├── TestAES256.java           # AES-256 test suite
-│   ├── TestChaCha20.java         # ChaCha20 test suite
-│   ├── TestSuite.java            # Test suite abstract
-│   ├── TestUtils.java            # Utilities
-│   ├── VerboseSHA256.java        # SHA-256 trace
-│   ├── VerboseAES256.java        # AES-256 trace
-│   └── VerboseChaCha20.java      # ChaCha20 trace
-│
-└── docker/
-    ├── Dockerfile                # Vulnerable container for attack demo
-    └── README_CTF.md             # Instructions for the CTF challenge
+    ├── Test.java           	  # All-in-one test suite
+    ├── TestSHA256.java           # SHA-256 test suite
+    ├── TestAES256.java           # AES-256 test suite
+    ├── TestChaCha20.java         # ChaCha20 test suite
+    ├── TestSuite.java            # Test suite abstract
+    ├── TestUtils.java            # Utilities
+    ├── VerboseSHA256.java        # SHA-256 trace
+    ├── VerboseAES256.java        # AES-256 trace
+    └── VerboseChaCha20.java      # ChaCha20 trace
+
 
 ```
 

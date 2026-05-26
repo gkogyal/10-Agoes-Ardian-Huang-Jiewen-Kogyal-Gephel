@@ -7,11 +7,13 @@ import chacha.ChaCha20;
 
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
+import java.util.regex.Pattern;
 
 import java.util.Scanner;
 import java.util.ArrayList;
 import java.util.function.Predicate;
 import java.util.Set;
+
 
 import java.sql.*;
 
@@ -32,7 +34,6 @@ public class Vault {
 	/***********************************************/
 
 	public static void main(String[] args) {
-		// Force stdout autoflush so output reaches the terminal even when piped.
 		System.setOut(new PrintStream(System.out, true));
 
 		try {
@@ -58,19 +59,13 @@ public class Vault {
 			loop();
 
 		} catch (Exception e) {
-			System.err.println("Fatal: " + e.getMessage());
-		} finally {
-			try { if (db != null) db.close(); } catch (SQLException ignored) {}
+			System.err.println(e.getMessage());
 		}
 	}
 
 	private static void setupNewVault() throws SQLException {
 		System.out.println("\n[New vault - choose a master password]");
-		String master = prompt(
-			"  Set master password (>=8 chars): ",
-			s -> s.length() >= 8,
-			"  Password must be at least 8 characters."
-		);
+		String master = prompt(" password: ", p -> p.matches("^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[^a-zA-Z0-9]).{12,}$"), "Needs 12 chars and special/digit/uppercase/lowercase");
 		String confirm = prompt("  Confirm password: ", s -> true, "");
 		if (!master.equals(confirm)) {
 			System.out.println("Passwords don't match. Exiting.");
@@ -136,9 +131,9 @@ public class Vault {
 			
 		}
 
-		String username = prompt(" USERNAME: ", u -> u.length()>=3 && u.matches("[a-zA-Z0-9_]+"), "Username must be at least 3 characters and contain only letters or underscores.");
+		String username = prompt(" username: ", u -> u.length()>=3 && u.matches("[a-zA-Z0-9_]+"), "Username must be at least 3 characters and contain only letters or underscores.");
 
-		String password = prompt(" PASSWORD: ", p -> p.length()>=12, "Password must have at least 12 characters");
+		String password = prompt(" password: ", p -> p.matches("^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[^a-zA-Z0-9]).{12,}$"), "Needs 12 chars and special/digit/uppercase/lowercase");
 
 		String choice = prompt("  cipher [1 = ChaCha20  2 = AES-256]: ", c -> c.equals("1") || c.equals("2"), "Enter one of the valid choices");
 
