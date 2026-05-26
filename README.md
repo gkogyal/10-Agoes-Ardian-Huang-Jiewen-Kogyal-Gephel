@@ -134,7 +134,7 @@ $ make vault-clear
 
 The option is available for users would like to access the SQLite database directly
 ```bash
-$ sqlite3 src/vault/
+$ sqlite3 src/vault/vault.db
 sqlite>  
 ```
 

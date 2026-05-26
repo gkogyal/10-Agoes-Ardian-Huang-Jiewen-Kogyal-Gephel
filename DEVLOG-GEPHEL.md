@@ -4,7 +4,7 @@
 * added vault functions for Vault.java
 * updated Vault.java to use SQL
 * added the sqlitte jar to allow for use of SQLite format
-* finished README
+* finished README.md and PRESENTATION.md
 
 ## 2026-05-24
 * implemented verbose option in chacha20
