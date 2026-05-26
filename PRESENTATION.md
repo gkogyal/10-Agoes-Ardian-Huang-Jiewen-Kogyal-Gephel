@@ -10,7 +10,7 @@ AES-256 (Advanced Encryption Standard) is a **symmetric block cipher**.
 
 ### Where does the encryption key come from?
 
-For a password vault, the user creates a master password. The master password is run through the SHA-256 hashing algorithm, which will always ouput a 32-byte hash of what looks like random data. Typing the correct master password will generate the exact same 32-byte AES key to unlock the vault.
+For a password vault, the user creates a master password. The master password is run through the SHA-256 hashing algorithm, which will always output a 32-byte hash of what looks like random data. Typing the correct master password will generate the exact same 32-byte AES key to unlock the vault.
 
 ## 2. Preparing the Data: Padding and ECB Mode
 
@@ -28,6 +28,7 @@ After padding to a multiple of 16, you have to split it up into 16-byte blocks b
 
 - The `AESCipher` wrapper slices the 32-byte array into two separate 16-byte blocks.
 - Each block is turned into ciphertext separately and put back together.
+- ECB can have limitations as if two separate blocks contain the exact same data, they would make the exact same ciphertext blocks, which makes an obvious pattern.
 
 ## 3. The Process and Math
 
@@ -36,10 +37,10 @@ Aes encrypts data by substituting bytes for different values to create something
 
 AES-256 requires 14 rounds of encryption, and an initial round of just setting up the encryption. This means that we need 15 different keys.
 
-In `AESKeySchedule.java`, the 32-byte master key is turned into a 60 words array, which makes 240 bytes as each word is four bytes. Each round key is 16 bytes, so this process called the `Rijndael Key Schedule` generates 15 keys. To prevent patterns or symmetries, the alogrithm heavily mutates the master key data by:
+In `AESKeySchedule.java`, the 32-byte master key is turned into a 60 word array, which makes 240 bytes as each word is four bytes. Each round key is 16 bytes, so this process called the `Rijndael Key Schedule` generates 15 keys. To prevent patterns or symmetries, the algorithm heavily mutates the master key data by:
 
 1. `rotWord()` shifts the bytes of the key to different positions.
-2. `subWord()` passing those bytes through a constant array called `SBOX` which substitutes the original 4 bytes of the key by mapping the number of each byte to the correlating index on the S-Box table, which has 256 values.
+2. `subWord()` passes those bytes through a constant array called `SBOX` which substitutes the original 4 bytes of the key by mapping the number of each byte to the correlating index on the S-Box table, which has 256 values.
 3. Using the `RCON` constant array, the output of the substitution's leftmost byte is XOR'd with the correlating constant from RCON.
 4. It takes the result of this and XORs it with the word from 8 positions ago (`words[i-8]`) to get the final result.
 
@@ -57,8 +58,8 @@ Next, the algorithm runs a 14 round loop. The first 13 loops uses four transform
 ```
 state[i][j] = Constants.SBOX[state[i][j]];
 ```
-- This method simply loops through the 16 bytes of the matrix. If the numeric value of a byte is 84, it would use whatever value is in index 84 of the `SBOX` array to substitute the orignal value.
-- The values int he table are non-linear, meaning that inputs next to each other would map to completely different and unrelated outputs, which gets rid of any predictability. 
+- This method simply loops through the 16 bytes of the matrix. If the numeric value of a byte is 84, it would use whatever value is in index 84 of the `SBOX` array to substitute the original value.
+- The values in the table are non-linear, meaning that inputs next to each other would map to completely different and unrelated outputs, which gets rid of any predictability. 
 
 #### 2. ShiftRows
 
@@ -73,9 +74,9 @@ for (int i = 1; i < 4; i++) {
 - This method loops through the rows of the matrix and slides the bytes to the left.
     - Row 0: No shift.
     - Row 1: Shifts left by 1 position.
-    - Row 2: Shifts left by 2 position.
-    - Row 3: Shifts left by 3 position.
-- Bytes in the same column gets moved into completley different columns
+    - Row 2: Shifts left by 2 positions.
+    - Row 3: Shifts left by 3 positions.
+- Bytes in the same column gets moved into comptlely different columns
 
 #### 3. MixColumns
 
@@ -87,7 +88,7 @@ state[0][i] = xtime(s0) ^ xtime(s1) ^ s1 ^ s2 ^ s3;
 - Multiplying bytes together can't overflow past 255, so the `Galois Field` (GF(2^8)) comes into play again.
 - The `xtime()` method shifts all of the bits of a byte one slot to the left. If the leftmost bit is 1, shifting it would cause an overflow.
 - To fix this, the byte is XORd with `0x1b` to force the value back into the 0-255 range.
-- This steps makes it so that just changing a single bit of your original password would completely alter every byte of the ciphertext within a few rounds.
+- This step makes it so that just changing a single bit of your original plaintext would completely alter every byte of the ciphertext within a few rounds.
 
 #### 4. AddRoundKey
 
@@ -96,7 +97,7 @@ state[i][j] = state[i][j] ^ roundKey[i][j];
 ```
 
 - This takes the 4x4 matrix, now scrambled, and XORs it against the round key of this round.
-- Without this step and using the correct keys, the matrix wouldn't be able to be reversed.
+- This step ensures that the matrix can only be reversed if you have the correct key.
 
 #### The Final Round
 

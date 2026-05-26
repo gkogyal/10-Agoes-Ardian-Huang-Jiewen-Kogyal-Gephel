@@ -1,5 +1,15 @@
 # Devlog - Ardian Agoes
 
+## 2026-05-26
+
+* Completed my portion of `PRESENTATION.md` documenting the process of AES256 encryption.
+
+## 2026-05-25
+
+* Completed the `AESCipher.java` wrapper and fixed issues across our directory where there were references to the wrong AES class.
+* Implemented a new verbose mode in encrypting and decrypting in `AESCipher.java` for testing and seeing each step.
+* Fixed issues in TestAES256.java and removed unnecessary lines in `ChaCha20.java`.
+
 ## 2026-05-23
 
 * Implemented unpadding logic in `Padding.java` for decryption and fixed error in logic (instead of appending 0s, append padding length)
