@@ -1,10 +1,24 @@
 # Devlog - Ardian Agoes
 
+## 2026-05-23
+
+* Implemented unpadding logic in `Padding.java` for decryption and fixed error in logic (instead of appending 0s, append padding length)
+* Added new `AesCIPHER.java` as a wrapper class to connect the padding and AES cipher. 
+
+## 2026-05-22
+
+* Implemented padding logic in `Padding.java` to guarantee the input length is a multiple of 16 bytes to avoid out of bound exceptions.
+
+## 2026-05-20
+
+* Fixed even more git merge errors and restored missing code in `ChaCha20.java`
+* Created initial `Padding.java` file 
+
 ## 2026-05-19
 
-* Fixed an issue where  Git conflict markers (`<<<<<<< HEAD`, `=======`, `>>>>>>>`) made during a branch merge messed up our code and halted progress.
+* Fixed an issue where Git conflict markers (`<<<<<<< HEAD`, `=======`, `>>>>>>>`) made during a branch merge messed up our code and halted progress.
 * Corrected a type error in the `encrypt` parameters and fixed a loop boundary in `decrypt` where intermediate rounds were incorrectly numbered.
-* Wrote a tester in `AESTester.java` inside the `testing/` directory.
+* Wrote a tester in `TestAES256.java` inside the `testing/` directory.
 
 ## 2026-05-18
 
@@ -15,13 +29,13 @@
 
 ## 2026-05-15
 
-* Updated `RCON` constants and wrote `subWord()` for SBOX substitution purposes;
+* Updated `RCON` constants and wrote `subWord()` for SBOX substitution purposes.
 * Wrote `expandKey()` and `rotWord()`. The first helps with word generation to provide roundkeys, and the second rotates 4 word bytes to the left.
 
 ## 2026-05-14
 
 * Wrote `xTime()`, a helper function that is used for the mixcolumns step of AES.
-* Wrote `multiply9()`, `multiply11()`, `multiply13()`, and `multiply14()` that are helper functions for reversinng the mixcolumns step.
+* Wrote `multiply9()`, `multiply11()`, `multiply13()`, and `multiply14()` that are helper functions for reversing the mixcolumns step.
 
 ## 2026-05-12
 * Wrote `shiftrows()` and `inverseShiftRows()`, which move the bytes to different columns for further mixing. The inverse is for decryption purposes.
@@ -30,7 +44,7 @@
 ## 2026-05-11
 
 * Finished `Constants.java`, adding the `INVERSE_SBOX` and `RCON` constants. 
-* Wrote `bytesToState` and `stateToBytes` in `AES.java`, mapping 128-bit blocks into a 4x4 matrix where the first four bytes occupy the first column. 
+* Wrote `bytesToState` and `stateToBytes` in `AES256.java`, mapping 128-bit blocks into a 4x4 matrix where the first four bytes occupy the first column. 
 * Wrote the `subBytes` and `invSubBytes` methods for non-linear substitution using the S-Box tables.
 
 ## 2026-05-10
