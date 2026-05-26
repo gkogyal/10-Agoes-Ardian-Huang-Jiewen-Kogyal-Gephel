@@ -67,7 +67,7 @@ Intentionally **vulnerable environment** as a container for an attack simulation
 
 ---
 
-## Repository Structure (WIP)
+## Repository Structure
 
 ```bash
 
@@ -78,6 +78,7 @@ Intentionally **vulnerable environment** as a container for an attack simulation
 ├── DEVLOG-ARDIAN.md
 ├── DEVLOG-JIEWEN.md
 ├── DEVLOG-GEPHEL.md
+├── makefile 					  # check [How to Build and Run](#how-to-build-and-run)
 ├── src/
 │   │
 │   ├── aes/
@@ -101,9 +102,15 @@ Intentionally **vulnerable environment** as a container for an attack simulation
 │       └── Constants.java		  # Sigma constants and utility values
 │
 ├── testing/
+│   ├── Test.java           	  # All-in-one test suite
 │   ├── TestSHA256.java           # SHA-256 test suite
 │   ├── TestAES256.java           # AES-256 test suite
-│   └── TestChaCha20.java         # ChaCha20 test suite
+│   ├── TestChaCha20.java         # ChaCha20 test suite
+│   ├── TestSuite.java            # Test suite abstract
+│   ├── TestUtils.java            # Utilities
+│   ├── VerboseSHA256.java        # SHA-256 trace
+│   ├── VerboseAES256.java        # AES-256 trace
+│   └── VerboseChaCha20.java      # ChaCha20 trace
 │
 └── docker/
     ├── Dockerfile                # Vulnerable container for attack demo
@@ -115,9 +122,37 @@ Intentionally **vulnerable environment** as a container for an attack simulation
 
 ## How to Build and Run
 
-### 1. Compile
+### 1. Test Algorithms
+
+To view the test suite for an algorithm, you can utilize make.
+
+```bash
+$ make test-aes
+$ make test-sha
+$ make test-chacha
+```
+
+For ease, an all-in-one test suite exists.
+```
+$ make test
+```
 
 ### 2. Run the Vault
+
+
+
+### 3. Capture the Flag
+
+
+
+### 4. Trace Algorithms
+
+The option to trace an algorithm exists.
+```bash
+$ make verbose-aes
+$ make verbose-sha
+$ make verbose-cha
+```
 
 ---
 
