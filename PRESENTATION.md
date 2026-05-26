@@ -197,3 +197,24 @@ ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad
 This matched what I got using Java's MessageDigest for sha-256.
 
 ---
+
+## 10. Testing
+
+`testing/TestSHA256.java` has three categories:
+- **Static cases**: known inputs including the `"abc"` test and boundary tests at 55, 56, 64 bytes for edge cases.
+- **Random cases**: byte arrays 10–300 bytes that we picked at random using secureRandom
+- **Custom cases**: strings you can type in directly into the CLI
+
+Every case gets compared against Java's built-in `MessageDigest` as the reference. 
+
+```bash
+make test-sha
+```
+Most recent run states **15 / 15 PASS**, so our code must be working
+
+---
+
+## 11. Refs
+
+- [NIST FIPS 180-4 - Secure Hash Standard](https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.180-4.pdf) 4.1.2 (helpers), 4.2.2 (constants), 5.1.1 (padding), 6.2.2 (schedule + compression)
+- [Wikipedia - SHA-2](https://en.wikipedia.org/wiki/SHA-2)
