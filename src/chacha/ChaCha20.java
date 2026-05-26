@@ -88,9 +88,6 @@ public class ChaCha20 {
 
 		byte[] output = new byte[input.length];
 		int processed = 0;
-
-		
-		int totalBlocks = (input.length + Constants.BLOCK_BYTES - 1) / Math.max(input.length == 0 ? 1 : Constants.BLOCK_BYTES, 1);
 		int numBlocks = (input.length == 0) ? 0 : ((input.length + Constants.BLOCK_BYTES - 1) / Constants.BLOCK_BYTES);
 
 
