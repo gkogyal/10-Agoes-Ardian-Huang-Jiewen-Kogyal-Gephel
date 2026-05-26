@@ -1,4 +1,109 @@
-# SHA-256 by Jiewen Huang
+# AES-256 by Ardian
+
+## 1. Overview 
+
+AES-256 (Advanced Encryption Standard) is a **symmetric block cipher**. 
+
+- Symmetric means that the same 32-byte or 256-bit key is used to lock and unlock the data
+- Block ciphers don't encrypt the data by character, and instead chops the data into 16-byte blocks and encrypts each block one at a time.
+- If a block is less than 16 bytes, we use `PKCS#7` padding to fill the gaps.
+
+### Where does the encryption key come from?
+
+For a password vault, the user creates a master password. The master password is run through the SHA-256 hashing algorithm, which will always ouput a 32-byte hash of what looks like random data. Typing the correct master password will generate the exact same 32-byte AES key to unlock the vault.
+
+## 2. Preparing the Data: Padding and ECB Mode
+
+### PKCS#7 Padding
+
+To make every piece of data a multiple of 16, we use a standard called PKCS#7 padding.
+
+- If a password is 20 bytes long, it would need 12 more bytes to be a multiple of 16 (32).
+- The algorithm looks at the number of missing bytes and appends the byte value of the number (0x0c) 12 times to the end of the string.
+- During decryption, the algorithm looks at the last byte, which would be 12, and cuts off the last 12 bytes to reveal the original password.
+
+### Electronic Codebook Mode
+
+After padding to a multiple of 16, you have to split it up into 16-byte blocks before feeding it into the AES engine with something called ECB mode.
+
+- The `AESCipher` wrapper slices the 32-byte array into two separate 16-byte blocks.
+- Each block is turned into ciphertext separately and put back together.
+
+## 3. The Process and Math
+
+Once the 16-byte block is put into the AES engine, it is converted into a 4x4 byte grid called the State Matrix where all the math occurs.
+Aes encrypts data by substituting bytes for different values to create something called **Confusion** and then shuffles the positions of the bytes to ensure that there is no correlation between the plaintext and ciphertext.
+
+AES-256 requires 14 rounds of encryption, and an initial round of just setting up the encryption. This means that we need 15 different keys.
+
+In `AESKeySchedule.java`, the 32-byte master key is turned into a 60 words array, which makes 240 bytes as each word is four bytes. Each round key is 16 bytes, so this process called the `Rijndael Key Schedule` generates 15 keys. To prevent patterns or symmetries, the alogrithm heavily mutates the master key data by:
+
+1. `rotWord()` shifts the bytes of the key to different positions.
+2. `subWord()` passing those bytes through a constant array called `SBOX` which substitutes the original 4 bytes of the key by mapping the number of each byte to the correlating index on the S-Box table, which has 256 values.
+3. Using the `RCON` constant array, the output of the substitution's leftmost byte is XOR'd with the correlating constant from RCON.
+4. It takes the result of this and XORs it with the word from 8 positions ago (`words[i-8]`) to get the final result.
+
+This occurs at every multiple of 8 (32/4 = 8) to match the length of the master key.
+
+### The Encryption Loop (`AES256.java`)
+
+The algorithm starts with XORing the grid with the raw master key, which instantly hides the plaintext before the heavy scrambling happens
+
+Next, the algorithm runs a 14 round loop. The first 13 loops uses four transformations in the following order:
+
+#### 1. SubBytes
+
+- Using the numeric value of each byte in the 4x4 grid, it matches that value as an index to look up the replacement in `SBOX`, and swaps the old byte for a new one.
+```
+state[i][j] = Constants.SBOX[state[i][j]];
+```
+- This method simply loops through the 16 bytes of the matrix. If the numeric value of a byte is 84, it would use whatever value is in index 84 of the `SBOX` array to substitute the orignal value.
+- The values int he table are non-linear, meaning that inputs next to each other would map to completely different and unrelated outputs, which gets rid of any predictability. 
+
+#### 2. ShiftRows
+
+```
+for (int i = 1; i < 4; i++) {
+    for (int j = 0; j < 4; j++) {
+        temp[j] = state[i][(j + i) % 4];
+    }
+    // copies temp back to state
+}
+```
+- This method loops through the rows of the matrix and slides the bytes to the left.
+    - Row 0: No shift.
+    - Row 1: Shifts left by 1 position.
+    - Row 2: Shifts left by 2 position.
+    - Row 3: Shifts left by 3 position.
+- Bytes in the same column gets moved into completley different columns
+
+#### 3. MixColumns
+
+```
+state[0][i] = xtime(s0) ^ xtime(s1) ^ s1 ^ s2 ^ s3;
+```
+
+- Each values of each vertical column of 4 bytes are mixed together using matrix multiplication.
+- Multiplying bytes together can't overflow past 255, so the `Galois Field` (GF(2^8)) comes into play again.
+- The `xtime()` method shifts all of the bits of a byte one slot to the left. If the leftmost bit is 1, shifting it would cause an overflow.
+- To fix this, the byte is XORd with `0x1b` to force the value back into the 0-255 range.
+- This steps makes it so that just changing a single bit of your original password would completely alter every byte of the ciphertext within a few rounds.
+
+#### 4. AddRoundKey
+
+```
+state[i][j] = state[i][j] ^ roundKey[i][j];
+```
+
+- This takes the 4x4 matrix, now scrambled, and XORs it against the round key of this round.
+- Without this step and using the correct keys, the matrix wouldn't be able to be reversed.
+
+#### The Final Round
+
+- In the 14th round, the final round of encryption, the algorithm completely skips the `MixColumns` transformation and only runs `SubBytes`, `ShiftRows`, and `AddRoundKey`.
+- This makes encryption and decrption symmetric, meaning every step forward in encryption can be a step backward for decryption purposes.
+
+# SHA-256 by Jiewen
 
 ## 1. What is SHA-256?
 
