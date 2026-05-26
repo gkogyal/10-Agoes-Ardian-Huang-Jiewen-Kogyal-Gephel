@@ -137,3 +137,35 @@ For each 64-byte block, we build a `W[]`, which is always 64 × 32-bit words for
 - **W[16..63]** is extended via `W[i] = σ₁(W[i-2]) + W[i-7] + σ₀(W[i-15]) + W[i-16]`.
 
 Essentially, we can turn 16 words into 64 words using the small sigma functions to basically mix in earlier words into later words, which allows us to scramble the letters better such that one letter change will change the entire resultant hash.
+
+---
+
+## 7. The Compression Function
+
+The compression takes the current 8-word state plus one block's `W[]`, runs 64 rounds and adds the result back into the state. Put simply, we use compression to do the actual hashing part. Everything else was just a setup until now, but here we take the 8 word state and the blocks of message schedule and mixes everything together using our various functions and after many rounds (64 of them) it adds the result back into the state.
+
+Copy state into 8 variables `a-h`:
+```java
+int a = state[0], b = state[1], ..., h = state[7];
+```
+
+Each round computes the new `a` and `e` using all the different functions we have:
+```java
+nextA = h + bigSigma1(e) + ch(e,f,g) + K[i] + W[i] + bigSigma0(a) + maj(a,b,c)
+nextE = d + h + bigSigma1(e) + ch(e,f,g) + K[i] + W[i]
+```
+
+Then we shift all 8 working variables down by one position:
+```java
+h = g;  g = f;  f = e;  e = nextE;
+d = c;  c = b;  b = a;  a = nextA;
+```
+
+After 64 rounds, **add** the working variables back into state:
+```java
+state[0] += a;  state[1] += b;  ... state[7] += h;
+```
+
+The `+=` is important, the function is called "compress" and not something like "encrypt". The message builds up from each block to get our final hash
+
+---
