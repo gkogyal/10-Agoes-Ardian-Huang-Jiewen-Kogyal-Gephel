@@ -14,13 +14,8 @@ Built to demonstrate the inner workings of cryptographic primitives (well-establ
 ### Table of Contents
 
 - [Project Description](#project-description)
-- [Features](#features)
 - [Repository Structure](#repository-structure)
 - [How to Build and Run](#how-to-build-and-run)
-- [Running the Tests](#running-tests)
-- [Docker: Vulnerability Demo](#docker-vulnerability-demo)
-- [Algorithm Summaries](#algorithm-summaries)
-- [Presentation](#presentation)
 - [References and Resources](#references-and-resources)
 
 ---
@@ -56,10 +51,6 @@ Minimal, functional **credential vault** that stores site/username/password entr
 
 ---
 
-## Features
-
----
-
 ## Repository Structure
 
 ```bash
@@ -71,7 +62,9 @@ Minimal, functional **credential vault** that stores site/username/password entr
 ├── DEVLOG-ARDIAN.md
 ├── DEVLOG-JIEWEN.md
 ├── DEVLOG-GEPHEL.md
-├── makefile 					  # check [How to Build and Run](#how-to-build-and-run)
+├── makefile				  
+├── lib/
+│   └── sqlite-jdbc.jar			  # needed for vault
 ├── src/
 │   │
 │   ├── aes/
@@ -94,7 +87,7 @@ Minimal, functional **credential vault** that stores site/username/password entr
 │       ├── QuarterRound.java	  # Helper function for ChaCha20
 │       └── Constants.java		  # Sigma constants and utility values
 │
-├── testing/
+└── testing/
     ├── Test.java           	  # All-in-one test suite
     ├── TestSHA256.java           # SHA-256 test suite
     ├── TestAES256.java           # AES-256 test suite
@@ -105,17 +98,17 @@ Minimal, functional **credential vault** that stores site/username/password entr
     ├── VerboseAES256.java        # AES-256 trace
     └── VerboseChaCha20.java      # ChaCha20 trace
 
-
 ```
 
 ---
 
 ## How to Build and Run
 
+Make is used for the ease of users.
+
 ### 1. Test Algorithms
 
-To view the test suite for an algorithm, you can utilize make.
-
+Users can view the test suite for an algorithm with the following commands.
 ```bash
 $ make test-aes
 $ make test-sha
@@ -129,28 +122,38 @@ $ make test
 
 ### 2. Run the Vault
 
+Users can start the vault and will be given sufficient instructions to navigate.
+```bash
+$ make vault
+```
 
+Users have the ability to reset the vault.
+```bash
+$ make vault-clear
+```
 
-### 3. Capture the Flag
+The option is available for users would like to access the SQLite database directly
+```bash
+$ sqlite3 src/vault/
+sqlite>  
+```
 
+Suggested commands:
+```bash
+sqlite> SELECT * from entries;
+sqlite> SELECT * from meta;
+```
 
+### 3. Trace Algorithms
 
-### 4. Trace Algorithms
-
-The option to trace an algorithm exists.
+Users have the option to trace an algorithm exists with make.
 ```bash
 $ make verbose-aes
 $ make verbose-sha
 $ make verbose-cha
 ```
 
----
-
-## Running Tests
-
----
-
-## Docker: Vulnerability Demo
+This can be used to find the actual ciphertext of each cryptographic algorithm.
 
 ---
 
