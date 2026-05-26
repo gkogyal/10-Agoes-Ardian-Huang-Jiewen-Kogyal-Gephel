@@ -18,3 +18,16 @@ A vault has to verify a user's password without ever storing the password itself
 3. And, in the event that if the database file is stolen, the attacker gets the hash only, and because SHA-256 is one-way, you cannot get the password from the hash
 
 ALSO: the hash is the **encryption key** for AES-256/ChaCha20 to encrypt.
+
+## 2. The Whole Process
+
+1. Take the raw input bytes
+2. Pad them out until the total length is a multiple of 64 bytes
+3. For each 64-byte block:
+    - build a 64-word "message schedule" from the block
+    - run 64 rounds of compression on the running state `H`
+    - add the result back into `H`
+4. Once every block has been processed, take `H` and serialize it into 32 bytes (convert the ints into a byte array, in a big-endian way, aka the most significant byte goes first)
+5. Those 32 bytes are the digest
+
+This pattern is called the **[Merkle–Damgård construction](https://en.wikipedia.org/wiki/Merkle%E2%80%93Damg%C3%A5rd_construction)**. Think of `H` like a running total. We start from the original values, then we take the current and the next 64 byte block and mix them together and do this successively until we get to the last block and that's our hash. Essentially, the final hash depends on every other byte. 
