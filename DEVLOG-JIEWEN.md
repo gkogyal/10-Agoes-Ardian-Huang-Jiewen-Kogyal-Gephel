@@ -71,3 +71,7 @@
 
 ## 2026-05-22
 * Continued working on `Vault.java`, added addEntry() function`
+
+## 2026-05-26
+
+* Filled in `testing/VerboseSHA256.java` modeled after Ardian's `VerboseAES256.java` so the verbose drivers stay consistent across all three algorithms
